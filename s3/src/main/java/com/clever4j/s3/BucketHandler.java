@@ -19,7 +19,7 @@ import java.util.stream.Stream;
 @AllNonnullByDefault
 public final class BucketHandler implements AutoCloseable {
 
-    private final String name;
+    private final String bucket;
     private final String accessKeyId;
     private final String secretAccessKey;
     private final String region;
@@ -31,8 +31,8 @@ public final class BucketHandler implements AutoCloseable {
 
     private final Object clientMutex = new Object();
 
-    public BucketHandler(String name, String accessKeyId, String secretAccessKey, String region, String prefix, String delimiter) {
-        this.name = name.strip();
+    public BucketHandler(String bucket, String accessKeyId, String secretAccessKey, String region, String prefix, String delimiter) {
+        this.bucket = bucket.strip();
         this.accessKeyId = accessKeyId.strip();
         this.secretAccessKey = secretAccessKey.strip();
         this.region = region.strip();
@@ -188,22 +188,43 @@ public final class BucketHandler implements AutoCloseable {
 //        return objects;
 //    }
 //
-    // list --------------------------------------------------------------------------------------------------------------
+    // list ------------------------------------------------------------------------------------------------------------
     public BucketObjects list() {
+        return list(null, false);
+    }
+
+    public BucketObjects list(boolean recursive) {
+        return list(null, recursive);
+    }
+
+    public BucketObjects list(String prefix) {
+        return list(prefix, false);
+    }
+
+    public BucketObjects list(@Nullable String prefix, boolean recursive) {
         List<BucketObject> objects = new ArrayList<>();
 
         ListObjectsV2Response response;
         String continuationToken = null;
 
         do {
-            ListObjectsV2Request request = ListObjectsV2Request.builder()
-                .bucket(name)
-                .prefix(prefix)
-                .delimiter("/")
-                .continuationToken(continuationToken)
-                .build();
+            ListObjectsV2Request.Builder builder = ListObjectsV2Request.builder();
 
-            response = getClient().listObjectsV2(request);
+            builder.bucket(bucket);
+
+            if (prefix != null) {
+                builder.prefix(this.prefix + prefix);
+            } else {
+                builder.prefix(this.prefix);
+            }
+
+            if (!recursive) {
+                builder.delimiter(delimiter);
+            }
+
+            builder.continuationToken(continuationToken);
+
+            response = getClient().listObjectsV2(builder.build());
             continuationToken = response.nextContinuationToken();
 
             for (S3Object s3Object : response.contents()) {
@@ -215,99 +236,23 @@ public final class BucketHandler implements AutoCloseable {
         return new BucketObjects(objects);
     }
 
-    //    public BucketObjects list(boolean recursive) {
-//        List<BucketObject> objects = new ArrayList<>();
-//
-//        ListObjectsV2Response response;
-//        String continuationToken = null;
-//
-//        do {
-//            ListObjectsV2Request request = ListObjectsV2Request.builder()
-//                .bucket(name)
-//                .prefix(prefix)
-//                .continuationToken(continuationToken)
-//                .build();
-//
-//            response = getClient().listObjectsV2(request);
-//            continuationToken = response.nextContinuationToken();
-//
-//            for (S3Object s3Object : response.contents()) {
-//                objects.add(createBucketObject(s3Object));
-//            }
-//
-//        } while (continuationToken != null);
-//
-//        return new BucketObjects(objects);
-//    }
-//
-//    public BucketObjects list(String prefix) {
-//        List<BucketObject> objects = new ArrayList<>();
-//
-//        ListObjectsV2Response response;
-//        String continuationToken = null;
-//
-//        do {
-//            ListObjectsV2Request request = ListObjectsV2Request.builder()
-//                .bucket(name)
-//                .prefix(this.prefix + prefix)
-//                .delimiter("/")
-//                .continuationToken(continuationToken)
-//                .build();
-//
-//            response = getClient().listObjectsV2(request);
-//            continuationToken = response.nextContinuationToken();
-//
-//            for (S3Object s3Object : response.contents()) {
-//                objects.add(createBucketObject(s3Object));
-//            }
-//
-//        } while (continuationToken != null);
-//
-//        return new BucketObjects(objects);
-//    }
-//
-//    public BucketObjects list(String prefix, boolean recursive) {
-//        List<BucketObject> objects = new ArrayList<>();
-//
-//        ListObjectsV2Response response;
-//        String continuationToken = null;
-//
-//        do {
-//            ListObjectsV2Request request = ListObjectsV2Request.builder()
-//                .bucket(name)
-//                .prefix(this.prefix + prefix)
-//                .continuationToken(continuationToken)
-//                .build();
-//
-//            response = getClient().listObjectsV2(request);
-//            continuationToken = response.nextContinuationToken();
-//
-//            for (S3Object s3Object : response.contents()) {
-//                objects.add(createBucketObject(s3Object));
-//            }
-//
-//        } while (continuationToken != null);
-//
-//        return new BucketObjects(objects);
-//    }
-//
-    // putObject -------------------------------------------------------------------------------------------------------
-    public void putObject(String key, byte[] content) {
+    // put -------------------------------------------------------------------------------------------------------------
+    public void put(String key, byte[] content) {
         S3Client client = getClient();
 
         PutObjectRequest putObjectRequest = PutObjectRequest.builder()
-            .bucket(name)
+            .bucket(bucket)
             .key(key)
             .build();
 
         client.putObject(putObjectRequest, RequestBody.fromBytes(content));
     }
 
-    public void putObject(String key, Path path) {
+    public void put(String key, Path path) {
         S3Client client = getClient();
 
         PutObjectRequest putObjectRequest = PutObjectRequest.builder()
-            .bucket(name)
+            .bucket(bucket)
             .key(key)
             .build();
 
@@ -332,7 +277,7 @@ public final class BucketHandler implements AutoCloseable {
     // get -------------------------------------------------------------------------------------------------------------
     public InputStream getInputStream(BucketObject object) {
         GetObjectRequest request = GetObjectRequest.builder()
-            .bucket(name)
+            .bucket(bucket)
             .key(object.getS3Object().key())
             .build();
 
