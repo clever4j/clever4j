@@ -1,16 +1,16 @@
 package com.clever4j.s3;
 
 import org.junit.jupiter.api.Test;
-import java.nio.file.Path;
 
-import static org.junit.jupiter.api.Assertions.*;
+import java.nio.file.Path;
 
 class BucketHandlerTest {
 
     @Test
     void crud() {
-        // BucketHandler bucketHandler = new BucketHandler();
-        // BucketObjects bucketObjects = bucketHandler.list();
+        BucketHandler bucketHandler = new BucketHandler(
+            ""
+        );
 
         bucketHandler.putObject("Screenshot from 2024-12-31 14-22-17.png", Path.of("/tmp/Screenshot from 2024-12-31 14-22-17.png"));
 
