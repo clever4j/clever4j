@@ -1,0 +1,44 @@
+plugins {
+    id 'java-library'
+    id 'maven-publish'
+}
+
+group = 'com.clever4j'
+version = '1.0.0'
+
+repositories {
+    mavenCentral()
+}
+
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            from components.java // Publikowanie kompilacji projektu jako artefaktu Javy
+        }
+    }
+    repositories {
+        mavenLocal()
+    }
+}
+
+dependencies {
+    // Use JUnit test framework.
+    testImplementation libs.junit
+
+    // This dependency is exported to consumers, that is to say found on their compile classpath.
+    api libs.commons.math3
+
+    // This dependency is used internally, and not exposed to consumers on their own compile classpath.
+    implementation libs.guava
+
+    // spotbugs-annotations
+    implementation 'com.github.spotbugs:spotbugs-annotations:4.8.6'
+
+    implementation 'jakarta.annotation:jakarta.annotation-api:3.0.0'
+}
+
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(21)
+    }
+}

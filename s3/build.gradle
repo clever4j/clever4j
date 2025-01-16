@@ -1,0 +1,48 @@
+plugins {
+    id 'java-library'
+    id 'maven-publish'
+}
+
+group = 'com.clever4j'
+version = '1.0.0'
+
+repositories {
+    mavenCentral()
+}
+
+test {
+    useJUnitPlatform()
+}
+
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            from components.java // Publikowanie kompilacji projektu jako artefaktu Javy
+        }
+    }
+    repositories {
+        mavenLocal()
+    }
+}
+
+dependencies {
+    // junit
+    testImplementation 'org.junit.jupiter:junit-jupiter:5.11.4' // użyj najnowszej wersji
+
+    // spotbugs-annotations
+    implementation 'com.github.spotbugs:spotbugs-annotations:4.8.6'
+
+    // jakarta
+    implementation 'jakarta.annotation:jakarta.annotation-api:3.0.0'
+
+    // s3
+    implementation 'software.amazon.awssdk:s3:2.29.49'
+
+    implementation project(":core")
+}
+
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(21)
+    }
+}
