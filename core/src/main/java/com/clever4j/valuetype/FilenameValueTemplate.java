@@ -1,36 +1,22 @@
 package com.clever4j.valuetype;
 
 import com.clever4j.lang.AllNonnullByDefault;
-import com.clever4j.valuetype.serializable.StringSerializable;
 import jakarta.annotation.Nullable;
 
 import java.util.Comparator;
 import java.util.Objects;
 
 @AllNonnullByDefault
-public abstract class StringValueTemplate<T extends StringValueTemplate<T>> implements Comparable<T>, StringSerializable {
+public abstract class FilenameValueTemplate<T extends FilenameValueTemplate<T>> implements Comparable<T> {
 
     private final static Comparator<String> STRING_COMPARATOR = Comparator.nullsLast(String::compareTo);
 
     @Nullable
     private final String value;
 
-    protected StringValueTemplate(
-        @Nullable String value,
-        boolean strip,
-        boolean cleanWhitespace,
-        boolean cleanNonAlphanumeric
-    ) {
+    protected FilenameValueTemplate(@Nullable String value, boolean strip) {
         if (value != null && strip) {
             value = value.strip();
-        }
-
-        if (value != null && cleanWhitespace) {
-            value = value.replaceAll("\\s+", " ");
-        }
-
-        if (value != null && cleanNonAlphanumeric) {
-            value = value.replaceAll("[^A-Za-z0-9\\sáéíóúÁÉÍÓÚàèìòùÀÈÌÒÙäëïöüÄËÏÖÜâêîôûÂÊÎÔÛ]", "");
         }
 
         this.value = value;
@@ -69,12 +55,6 @@ public abstract class StringValueTemplate<T extends StringValueTemplate<T>> impl
         }
     }
 
-    @Nullable
-    @Override
-    public String serializeToString() {
-        return this.value;
-    }
-
     @Override
     public int compareTo(T value) {
         return STRING_COMPARATOR.compare(this.value, value.getNullableValue());
@@ -97,7 +77,7 @@ public abstract class StringValueTemplate<T extends StringValueTemplate<T>> impl
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        StringValueTemplate<?> that = (StringValueTemplate<?>) o;
+        FilenameValueTemplate<?> that = (FilenameValueTemplate<?>) o;
         return Objects.equals(value, that.value);
     }
 

@@ -1,12 +1,13 @@
 package com.clever4j.valuetype;
 
 import com.clever4j.lang.AllNonnullByDefault;
+import com.clever4j.valuetype.serializable.BooleanSerializable;
 import jakarta.annotation.Nullable;
 
 import java.util.Objects;
 
 @AllNonnullByDefault
-public abstract class BooleanValueTemplate<T extends BooleanValueTemplate<T>> {
+public abstract class BooleanValueTemplate<T extends BooleanValueTemplate<T>> implements BooleanSerializable {
 
     @Nullable
     private final Boolean value;
@@ -50,5 +51,11 @@ public abstract class BooleanValueTemplate<T extends BooleanValueTemplate<T>> {
     @Override
     public int hashCode() {
         return Objects.hashCode(value);
+    }
+
+    @Nullable
+    @Override
+    public Boolean serializeToBoolean() {
+        return this.value;
     }
 }

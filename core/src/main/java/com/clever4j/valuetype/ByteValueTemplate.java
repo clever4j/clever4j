@@ -1,24 +1,23 @@
 package com.clever4j.valuetype;
 
 import com.clever4j.lang.AllNonnullByDefault;
-import com.clever4j.valuetype.serializable.LongSerializable;
 import jakarta.annotation.Nonnull;
-import jakarta.annotation.Nullable;
 
+import javax.annotation.Nullable;
 import java.util.Objects;
 
 @AllNonnullByDefault
-public abstract class LongValueTemplate<T extends LongValueTemplate<T>> implements Comparable<T>, LongSerializable {
+public abstract class ByteValueTemplate<T extends ByteValueTemplate<T>> implements Comparable<T> {
 
     @Nullable
     private final Long value;
 
-    protected LongValueTemplate(@Nullable Long value) {
+    protected ByteValueTemplate(@Nullable Long value) {
         this.value = value;
     }
 
     @Nonnull
-    public static <T extends LongValueTemplate<?>> T sum(ObjectFactory<T> objectFactory, T... values) {
+    public static <T extends ByteValueTemplate<?>> T sum(ObjectFactory<T> objectFactory, T... values) {
         long sum = 0;
 
         for (T value : values) {
@@ -71,12 +70,6 @@ public abstract class LongValueTemplate<T extends LongValueTemplate<T>> implemen
         return createObject(requireValue() * value);
     }
 
-    @Nullable
-    @Override
-    public Long serializeToLong() {
-        return this.value;
-    }
-
     @Nonnull
     @Override
     public String toString() {
@@ -87,7 +80,7 @@ public abstract class LongValueTemplate<T extends LongValueTemplate<T>> implemen
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        LongValueTemplate<?> that = (LongValueTemplate<?>) o;
+        ByteValueTemplate<?> that = (ByteValueTemplate<?>) o;
         return Objects.equals(value, that.value);
     }
 

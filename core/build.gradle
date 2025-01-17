@@ -21,15 +21,13 @@ publishing {
     }
 }
 
+test {
+    useJUnitPlatform()
+}
+
 dependencies {
-    // Use JUnit test framework.
-    testImplementation libs.junit
-
-    // This dependency is exported to consumers, that is to say found on their compile classpath.
-    api libs.commons.math3
-
-    // This dependency is used internally, and not exposed to consumers on their own compile classpath.
-    implementation libs.guava
+    // junit
+    testImplementation 'org.junit.jupiter:junit-jupiter:5.11.4' // użyj najnowszej wersji
 
     // spotbugs-annotations
     implementation 'com.github.spotbugs:spotbugs-annotations:4.8.6'

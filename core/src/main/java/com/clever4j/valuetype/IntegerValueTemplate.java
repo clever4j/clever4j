@@ -1,23 +1,24 @@
 package com.clever4j.valuetype;
 
 import com.clever4j.lang.AllNonnullByDefault;
+import com.clever4j.valuetype.serializable.IntegerSerializable;
 import jakarta.annotation.Nonnull;
 
 import javax.annotation.Nullable;
 import java.util.Objects;
 
 @AllNonnullByDefault
-public abstract class IntegerTemplate<T extends IntegerTemplate<T>> implements Comparable<T> {
+public abstract class IntegerValueTemplate<T extends IntegerValueTemplate<T>> implements Comparable<T>, IntegerSerializable {
 
     @Nullable
     private final Integer value;
 
-    protected IntegerTemplate(@Nullable Integer value) {
+    protected IntegerValueTemplate(@Nullable Integer value) {
         this.value = value;
     }
 
     @Nonnull
-    public static <T extends IntegerTemplate<?>> T sum(ObjectFactory<T> objectFactory, T... values) {
+    public static <T extends IntegerValueTemplate<?>> T sum(ObjectFactory<T> objectFactory, T... values) {
         int sum = 0;
 
         for (T value : values) {
@@ -76,11 +77,17 @@ public abstract class IntegerTemplate<T extends IntegerTemplate<T>> implements C
         return String.valueOf(value);
     }
 
+    @Nullable
+    @Override
+    public Integer serializeToInteger() {
+        return value;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        IntegerTemplate<?> that = (IntegerTemplate<?>) o;
+        IntegerValueTemplate<?> that = (IntegerValueTemplate<?>) o;
         return Objects.equals(value, that.value);
     }
 

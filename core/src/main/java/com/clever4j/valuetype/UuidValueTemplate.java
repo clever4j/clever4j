@@ -1,6 +1,7 @@
 package com.clever4j.valuetype;
 
 import com.clever4j.lang.AllNonnullByDefault;
+import com.clever4j.valuetype.serializable.StringSerializable;
 import jakarta.annotation.Nullable;
 
 import java.util.Comparator;
@@ -10,7 +11,7 @@ import java.util.UUID;
 import static java.util.Objects.requireNonNull;
 
 @AllNonnullByDefault
-public abstract class UuidValueTemplate<T extends UuidValueTemplate<T>> implements Comparable<T> {
+public abstract class UuidValueTemplate<T extends UuidValueTemplate<T>> implements Comparable<T>, StringSerializable {
 
     private final static Comparator<UUID> STRING_COMPARATOR = Comparator.nullsLast(UUID::compareTo);
 
@@ -55,6 +56,12 @@ public abstract class UuidValueTemplate<T extends UuidValueTemplate<T>> implemen
 
     public boolean equals(UUID object) {
         return Objects.equals(value, object);
+    }
+
+    @Nullable
+    @Override
+    public String serializeToString() {
+        return value == null ? null : value.toString();
     }
 
     @Override

@@ -242,7 +242,7 @@ public final class BucketHandler implements AutoCloseable {
 
         PutObjectRequest putObjectRequest = PutObjectRequest.builder()
             .bucket(bucket)
-            .key(key)
+            .key(this.prefix + key)
             .build();
 
         client.putObject(putObjectRequest, RequestBody.fromBytes(content));
@@ -253,7 +253,7 @@ public final class BucketHandler implements AutoCloseable {
 
         PutObjectRequest putObjectRequest = PutObjectRequest.builder()
             .bucket(bucket)
-            .key(key)
+            .key(this.prefix + key)
             .build();
 
         client.putObject(putObjectRequest, RequestBody.fromFile(path));
@@ -324,6 +324,26 @@ public final class BucketHandler implements AutoCloseable {
 
         public Stream<BucketObject> stream() {
             return objects.stream();
+        }
+
+        public int size() {
+            return objects.size();
+        }
+
+        public boolean isEmpty() {
+            return objects.isEmpty();
+        }
+
+        public BucketObject get(int index) {
+            return objects.get(index);
+        }
+
+        public BucketObject getFirst() {
+            return objects.getFirst();
+        }
+
+        public BucketObject getLast() {
+            return objects.getLast();
         }
 
         // public List<BucketObject> list() {
