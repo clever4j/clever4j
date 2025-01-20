@@ -1,0 +1,40 @@
+plugins {
+    id 'java-library'
+    id 'maven-publish'
+}
+
+group = 'com.clever4j.rdb'
+version = '1.0.0'
+
+repositories {
+    mavenCentral()
+}
+
+test {
+    useJUnitPlatform()
+}
+
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            from components.java // Publikowanie kompilacji projektu jako artefaktu Javy
+        }
+    }
+    repositories {
+        mavenLocal()
+    }
+}
+
+dependencies {
+    implementation project(":core")
+
+    // PostgreSQL
+    runtimeOnly 'org.postgresql:postgresql'
+    implementation 'org.postgresql:postgresql:42.7.3'
+}
+
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(21)
+    }
+}

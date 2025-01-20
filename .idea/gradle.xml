@@ -10,6 +10,7 @@
           <set>
             <option value="$PROJECT_DIR$" />
             <option value="$PROJECT_DIR$/core" />
+            <option value="$PROJECT_DIR$/rdb" />
             <option value="$PROJECT_DIR$/s3" />
           </set>
         </option>
