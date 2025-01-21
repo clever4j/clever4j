@@ -3,7 +3,7 @@ plugins {
     id 'maven-publish'
 }
 
-group = 'com.clever4j.rdb'
+group = 'com.clever4j.rdbgenerator'
 version = '1.0.0'
 
 repositories {
@@ -35,6 +35,8 @@ dependencies {
     implementation 'org.yaml:snakeyaml:2.3'
 
     implementation 'com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:2.18.2'
+
+    implementation project(":rdb")
 }
 
 java {

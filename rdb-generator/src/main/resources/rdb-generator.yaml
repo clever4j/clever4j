@@ -1,0 +1,7 @@
+databases:
+  traisit-database:
+    target-directory: "/home/inspipi/desktop/traisit/traisit-core/src/main/java/com/traisit/domain/database/test"
+    package-name: "com.traisit.domain.database.test"
+  traisit-database-2:
+    target-directory: "/home/inspipi/desktop/traisit/traisit-core/src/main/java/com/traisit/domain/database/test"
+    package-name: "com.traisit.domain.database.test"

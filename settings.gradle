@@ -4,4 +4,4 @@ plugins {
 
 rootProject.name = 'clever4j'
 
-include 'core', 's3', 'rdb'
+include 'core', 's3', 'rdb', 'rdb-generator'
