@@ -36,6 +36,14 @@ dependencies {
 
     implementation 'com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:2.18.2'
 
+    // implementation 'fr.inria.gforge.spoon:spoon-core:11.1.0'
+
+    // https://mvnrepository.com/artifact/fr.inria.gforge.spoon/spoon-core
+    // implementation 'fr.inria.gforge.spoon:spoon-core:11.1.1-beta-23'
+
+    // https://mvnrepository.com/artifact/org.freemarker/freemarker
+    implementation 'org.freemarker:freemarker:2.3.34'
+
     implementation project(":rdb")
 }
 

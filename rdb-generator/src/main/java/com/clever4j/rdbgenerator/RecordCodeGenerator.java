@@ -5,6 +5,10 @@ import com.clever4j.rdb.metadata.Column;
 import com.clever4j.rdb.metadata.Table;
 import com.clever4j.text.NamingStyleConverter;
 import com.clever4j.text.NamingStyleConverter.NamingStyle;
+import spoon.Launcher;
+import spoon.reflect.CtModel;
+import spoon.reflect.declaration.*;
+import spoon.reflect.factory.PackageFactory;
 
 import java.io.FileOutputStream;
 import java.io.IOException;

@@ -27,7 +27,12 @@ public class Main {
 
         for (Table table : tables) {
             RecordCodeGenerator recordCodeGenerator = new RecordCodeGenerator();
-            recordCodeGenerator.generate(table, "/home/inspipi/desktop/traisit/traisit-core/src/main/java/com/traisit/domain/database/test");
+            recordCodeGenerator.generate(table, "/home/workstati/desktop/traisit/traisit-core/src/main/java/com/traisit/domain/database/test");
+
+            DaoCodeGenerator daoCodeGenerator = new DaoCodeGenerator();
+            daoCodeGenerator.generate(table, "/home/workstati/desktop/traisit/traisit-core/src/main/java/com/traisit/domain/database/test");
+
+            break;
         }
     }
 }
