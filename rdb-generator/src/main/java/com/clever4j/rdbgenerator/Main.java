@@ -2,8 +2,10 @@ package com.clever4j.rdbgenerator;
 
 import com.clever4j.rdb.metadata.MetadataProvider;
 import com.clever4j.rdb.metadata.Table;
+import freemarker.template.TemplateException;
 
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
@@ -20,7 +22,7 @@ public class Main {
         return DriverManager.getConnection(url, user, password);
     }
 
-    public static void main(String[] args) throws SQLException, FileNotFoundException {
+    public static void main(String[] args) throws SQLException, IOException, TemplateException {
         MetadataProvider metadataProvider = new MetadataProvider(getConnection());
 
         List<Table> tables = metadataProvider.getTables();
@@ -29,8 +31,8 @@ public class Main {
             RecordCodeGenerator recordCodeGenerator = new RecordCodeGenerator();
             recordCodeGenerator.generate(table, "/home/workstati/desktop/traisit/traisit-core/src/main/java/com/traisit/domain/database/test");
 
-            DaoCodeGenerator daoCodeGenerator = new DaoCodeGenerator();
-            daoCodeGenerator.generate(table, "/home/workstati/desktop/traisit/traisit-core/src/main/java/com/traisit/domain/database/test");
+            // DaoCodeGenerator daoCodeGenerator = new DaoCodeGenerator();
+            // daoCodeGenerator.generate(table, "/home/workstati/desktop/traisit/traisit-core/src/main/java/com/traisit/domain/database/test");
 
             break;
         }
