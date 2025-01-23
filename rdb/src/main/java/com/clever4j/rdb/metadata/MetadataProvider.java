@@ -44,13 +44,14 @@ public final class MetadataProvider {
         Set<String> primaryKeys = getPrimaryKeys(tableName, metaData);
 
         while (resultSet.next()) {
-            String columnName = resultSet.getString("COLUMN_NAME");
-            String columnType = resultSet.getString("TYPE_NAME");
+            String name = resultSet.getString("COLUMN_NAME");
+            String type = resultSet.getString("TYPE_NAME");
+            String javaType = resultSet.getString("TYPE_NAME");
 
-            boolean primaryKey = primaryKeys.contains(columnName);
+            boolean primaryKey = primaryKeys.contains(name);
             boolean isNullable = resultSet.getInt("NULLABLE") == DatabaseMetaData.columnNullable;
 
-            columns.add(new Column(columnName, primaryKey, columnType, isNullable));
+            columns.add(new Column(name, primaryKey, type, isNullable));
         }
 
         return columns;
@@ -66,5 +67,17 @@ public final class MetadataProvider {
         }
 
         return primaryKeys;
+    }
+
+    private String mapDbTypeToJavaType(String columnType) {
+        return switch (columnType) {
+            case "uuid" -> "java.lang.String";
+            case "timestamp" -> "java.time.LocalDateTime";
+            case "varchar" -> "java.lang.String";
+            case "text" -> "java.lang.String";
+            case "bool" -> "java.lang.Boolean";
+            case "int4" -> "java.lang.Integer";
+            default -> "java.lang.String";
+        };
     }
 }
