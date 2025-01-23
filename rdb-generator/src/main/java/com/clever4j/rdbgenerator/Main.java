@@ -27,16 +27,33 @@ public class Main {
 
         List<Table> tables = metadataProvider.getTables();
         TemplateConfiguration templateConfiguration = new TemplateConfiguration();
+        String distinctionDirectory = "/home/workstati/desktop/traisit/traisit-core/src/main/java/com/traisit/domain/database/test";
 
         for (Table table : tables) {
+            // record
+            String packageName = "com.traisit.domain.database.test";
+
             RecordGenerator recordGenerator = new RecordGenerator(
-                "com.traisit.domain.database.test",
+                packageName,
                 table,
                 templateConfiguration,
                 databaseTypeMapper
             );
 
-            recordGenerator.generate("/home/workstati/desktop/traisit/traisit-core/src/main/java/com/traisit/domain/database/test");
+            recordGenerator.generate(distinctionDirectory);
+
+            // dao
+            DaoGenerator daoGenerator = new DaoGenerator(
+                packageName,
+                table,
+                recordGenerator,
+                templateConfiguration,
+                databaseTypeMapper
+            );
+
+            daoGenerator.generate(distinctionDirectory);
+
+            break;
         }
     }
 }

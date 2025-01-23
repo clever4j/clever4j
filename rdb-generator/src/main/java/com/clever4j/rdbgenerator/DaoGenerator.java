@@ -14,7 +14,7 @@ import java.util.List;
 import java.util.Map;
 
 @AllNonnullByDefault
-public class RecordGenerator {
+public class DaoGenerator {
 
     private static final NamingStyleConverter NAMING_STYLE_CONVERTER = new NamingStyleConverter();
 
@@ -24,26 +24,35 @@ public class RecordGenerator {
 
     private String packageName;
     private String className;
-    private List<RecordField> fields;
+    private RecordGenerator recordGenerator;
+    private List<String> partA;
 
-    public RecordGenerator(String packageName, Table table, TemplateConfiguration templateConfiguration, DatabaseTypeMapper databaseTypeMapper) {
+    public DaoGenerator(String packageName, Table table, RecordGenerator recordGenerator, TemplateConfiguration templateConfiguration, DatabaseTypeMapper databaseTypeMapper) {
         this.table = table;
+        this.recordGenerator = recordGenerator;
         this.templateConfiguration = templateConfiguration;
         this.databaseTypeMapper = databaseTypeMapper;
 
         // load fields
         this.packageName = packageName;
-        this.className = NAMING_STYLE_CONVERTER.convert(table.name(), NamingStyle.PASCAL_CASE) + "Record";
-        this.fields = table.columns().stream()
-            .map(column -> {
-                return new RecordField(
-                    databaseTypeMapper.map(column.type()),
-                    NAMING_STYLE_CONVERTER.convert(column.name(), NamingStyle.CAMEL_CASE),
-                    column.name(),
-                    column.primaryKey(),
-                    column.nullable()
-                );
-            }).toList();
+        this.className = NAMING_STYLE_CONVERTER.convert(table.name(), NamingStyle.PASCAL_CASE) + "Dao";
+
+        // this.partA = recordGenerator.getFields().stream()
+        //     .map(recordField -> {
+        //
+        //
+        //     }).toList();
+
+        // this.fields = table.columns().stream()
+        //     .map(column -> {
+        //         return new RecordField(
+        //             databaseTypeMapper.map(column.type()),
+        //             NAMING_STYLE_CONVERTER.convert(column.name(), NamingStyle.CAMEL_CASE),
+        //             column.name(),
+        //             column.primaryKey(),
+        //             column.nullable()
+        //         );
+        //     }).toList();
     }
 
     public void generate(String distinctionDirectory) throws IOException, TemplateException {
@@ -51,39 +60,14 @@ public class RecordGenerator {
 
         model.put("packageName", packageName);
         model.put("className", className);
+        model.put("recordGenerator", recordGenerator);
         model.put("table", table.name());
-        model.put("fields", fields);
+        // model.put("fields", fields);
 
-        Template template = templateConfiguration.getTemplate("record.ftlh");
+        Template template = templateConfiguration.getTemplate("dao.ftlh");
 
         try (FileWriter fileWriter = new FileWriter("%s/%s.java".formatted(distinctionDirectory, className))) {
             template.process(model, fileWriter);
         }
-    }
-
-    public String getClassName() {
-        return className;
-    }
-
-    public Table getTable() {
-        return table;
-    }
-
-    public String getPackage() {
-        return packageName;
-    }
-
-    public List<RecordField> getFields() {
-        return fields;
-    }
-
-    public record RecordField(
-        String type,
-        String name,
-        String colum,
-        boolean primaryKey,
-        boolean nullable
-    ) {
-
     }
 }
