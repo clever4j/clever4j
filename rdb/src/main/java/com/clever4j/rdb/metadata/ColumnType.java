@@ -2,12 +2,9 @@ package com.clever4j.rdb.metadata;
 
 import com.clever4j.lang.AllNonnullByDefault;
 
-import java.util.List;
-
 @AllNonnullByDefault
-public record Table(
-    String name,
-    Engine engine,
-    List<Column> columns
+public record ColumnType(
+    String type,
+    Engine engine
 ) {
 }

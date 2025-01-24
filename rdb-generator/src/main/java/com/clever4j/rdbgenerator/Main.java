@@ -27,7 +27,7 @@ public class Main {
 
         List<Table> tables = metadataProvider.getTables();
         TemplateConfiguration templateConfiguration = new TemplateConfiguration();
-        String distinctionDirectory = "/home/workstati/desktop/traisit/traisit-core/src/main/java/com/traisit/domain/database/test";
+        String distinctionDirectory = "/home/inspipi/desktop/traisit/traisit-core/src/main/java/com/traisit/domain/database/test";
 
         for (Table table : tables) {
             // record

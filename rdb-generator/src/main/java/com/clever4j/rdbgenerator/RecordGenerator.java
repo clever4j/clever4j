@@ -1,6 +1,7 @@
 package com.clever4j.rdbgenerator;
 
 import com.clever4j.lang.AllNonnullByDefault;
+import com.clever4j.rdb.metadata.Column;
 import com.clever4j.rdb.metadata.Table;
 import com.clever4j.text.NamingStyleConverter;
 import com.clever4j.text.NamingStyleConverter.NamingStyle;
@@ -20,7 +21,6 @@ public class RecordGenerator {
 
     private final Table table;
     private final TemplateConfiguration templateConfiguration;
-    private final DatabaseTypeMapper databaseTypeMapper;
 
     private String packageName;
     private String className;
@@ -29,7 +29,6 @@ public class RecordGenerator {
     public RecordGenerator(String packageName, Table table, TemplateConfiguration templateConfiguration, DatabaseTypeMapper databaseTypeMapper) {
         this.table = table;
         this.templateConfiguration = templateConfiguration;
-        this.databaseTypeMapper = databaseTypeMapper;
 
         // load fields
         this.packageName = packageName;
@@ -37,11 +36,12 @@ public class RecordGenerator {
         this.fields = table.columns().stream()
             .map(column -> {
                 return new RecordField(
-                    databaseTypeMapper.map(column.type()),
+                    databaseTypeMapper.map(column.type().type()).getCanonicalName(),
                     NAMING_STYLE_CONVERTER.convert(column.name(), NamingStyle.CAMEL_CASE),
                     column.name(),
                     column.primaryKey(),
-                    column.nullable()
+                    column.nullable(),
+                    column
                 );
             }).toList();
     }
@@ -82,7 +82,8 @@ public class RecordGenerator {
         String name,
         String colum,
         boolean primaryKey,
-        boolean nullable
+        boolean nullable,
+        Column column
     ) {
 
     }

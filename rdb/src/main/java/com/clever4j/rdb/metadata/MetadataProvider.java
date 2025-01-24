@@ -31,7 +31,7 @@ public final class MetadataProvider {
             String tableName = resultSet.getString("TABLE_NAME");
             List<Column> columns = getColumns(tableName, metaData);
 
-            tables.add(new Table(tableName, Collections.unmodifiableList(columns)));
+            tables.add(new Table(tableName, Engine.POSTGRESQL, Collections.unmodifiableList(columns)));
         }
 
         return tables;
@@ -46,12 +46,16 @@ public final class MetadataProvider {
         while (resultSet.next()) {
             String name = resultSet.getString("COLUMN_NAME");
             String type = resultSet.getString("TYPE_NAME");
-            String javaType = resultSet.getString("TYPE_NAME");
 
             boolean primaryKey = primaryKeys.contains(name);
             boolean isNullable = resultSet.getInt("NULLABLE") == DatabaseMetaData.columnNullable;
 
-            columns.add(new Column(name, primaryKey, type, isNullable));
+            columns.add(new Column(
+                name,
+                primaryKey,
+                new ColumnType(type, Engine.POSTGRESQL),
+                isNullable
+            ));
         }
 
         return columns;

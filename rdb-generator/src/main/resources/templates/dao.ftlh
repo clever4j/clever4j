@@ -25,7 +25,7 @@ public class ${className} {
             while (resultSet.next()) {
                 result.add(new AuthSessionRecord(
                     <#list recordGenerator.fields as field>
-                        sql.append("${field.colum}")<#if field?has_next>,</#if>
+                        ${generateCreateJavaType(field)}<#if field?has_next>,</#if>
                     </#list>
                 ));
             }
