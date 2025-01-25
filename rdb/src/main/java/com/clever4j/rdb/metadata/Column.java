@@ -6,7 +6,7 @@ import com.clever4j.lang.AllNonnullByDefault;
 public record Column(
     String name,
     boolean primaryKey,
-    ColumnType type,
+    DataType type,
     boolean nullable
 ) {
 }

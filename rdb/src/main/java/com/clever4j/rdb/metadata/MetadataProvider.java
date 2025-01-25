@@ -53,7 +53,7 @@ public final class MetadataProvider {
             columns.add(new Column(
                 name,
                 primaryKey,
-                new ColumnType(type, Engine.POSTGRESQL),
+                new DataType(type, Engine.POSTGRESQL),
                 isNullable
             ));
         }

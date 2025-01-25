@@ -1,4 +1,4 @@
-package com.clever4j.rdbgenerator;
+package com.clever4j.rdbgenerator.configuration;
 
 import com.clever4j.lang.AllNonnullByDefault;
 import com.fasterxml.jackson.annotation.JsonProperty;

@@ -1,6 +1,7 @@
-package com.clever4j.rdbgenerator;
+package com.clever4j.rdbgenerator.configuration;
 
 import com.clever4j.lang.AllNonnullByDefault;
+import freemarker.core.PlainTextOutputFormat;
 import freemarker.template.Configuration;
 import freemarker.template.Template;
 import freemarker.template.TemplateExceptionHandler;
@@ -18,6 +19,7 @@ public final class TemplateConfiguration {
 
         configuration.setClassForTemplateLoading(this.getClass(), "/templates/");
         configuration.setDefaultEncoding("UTF-8");
+        // configuration.setOutputFormat(PlainTextOutputFormat.INSTANCE);
         configuration.setTemplateExceptionHandler(TemplateExceptionHandler.RETHROW_HANDLER);
         configuration.setLogTemplateExceptions(false);
         configuration.setWrapUncheckedExceptions(true);

@@ -11,7 +11,7 @@ import java.util.Map;
 import java.util.UUID;
 
 @AllNonnullByDefault
-public final class DatabaseTypeMapper {
+public final class TypeMapper {
 
     private static final Map<String, Class<?>> MAPPING = new HashMap<>();
 
