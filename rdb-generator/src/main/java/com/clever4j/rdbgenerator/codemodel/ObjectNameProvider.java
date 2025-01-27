@@ -17,6 +17,6 @@ public final class ObjectNameProvider {
     }
 
     public String getDaoName(RecordModel record) {
-        return record.name() + "Dao";
+        return NAMING_STYLE_CONVERTER.convert(record.tableName(), NamingStyleConverter.NamingStyle.PASCAL_CASE) + "Dao";
     }
 }

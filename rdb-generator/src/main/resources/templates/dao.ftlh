@@ -102,4 +102,26 @@ public class ${name} {
             throw new RuntimeException(e);
         }
     }
+
+    // UPDATE ----------------------------------------------------------------------------------------------------------
+    public void update(${recordName} record, Connection connection) {
+        StringBuilder query = new StringBuilder();
+        query.append("UPDATE ${tableName} SET ");
+    <#list recordFields as f>
+        query.append("${f.name} = ?<#if f?has_next>,</#if> ");
+    </#list>
+        query.append("WHERE <#list primaryKeyFields as f>${f.columnName} = ?<#if f?has_next> AND </#if></#list>");
+
+        try (PreparedStatement statement = connection.prepareStatement(query.toString())) {
+        <#list recordFields as f>
+            statement.setObject(${f?index + 1}, record.${f.name}());
+        </#list>
+        <#list primaryKeyFields as f>
+            statement.setObject(${f?index + recordFieldsSize + 1}, record.${f.name}());
+        </#list>
+            statement.execute();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
 }

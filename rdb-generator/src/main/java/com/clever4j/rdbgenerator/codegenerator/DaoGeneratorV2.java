@@ -52,6 +52,8 @@ public class DaoGeneratorV2 {
         model.put("recordName", daoModel.recordModel().name());
         model.put("recordFields", daoModel.recordModel().fields());
 
+        model.put("recordFieldsSize", daoModel.recordModel().fields().size());
+
         List<RecordField> primaryKeyFields = daoModel.recordModel().fields().stream()
             .filter(RecordField::primaryKey)
             .toList();
@@ -84,6 +86,7 @@ public class DaoGeneratorV2 {
 
         // functions
         model.put("generateCreateJavaType", new GenerateCreateJavaType());
+        model.put("setStatementObject", new SetStatementObject());
 
         templateProcessor.processDaoTemplate(model, "%s/%s.java".formatted(distinctionDirectory, daoModel.name()));
     }
@@ -111,6 +114,15 @@ public class DaoGeneratorV2 {
             } else {
                 throw new RuntimeException("Unsupported type");
             }
+        }
+    }
+
+    private class SetStatementObject implements TemplateMethodModelEx {
+
+        @Override
+        public Object exec(List arguments) throws TemplateModelException {
+            System.out.println("test");
+            return "?";
         }
     }
 }
