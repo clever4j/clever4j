@@ -21,19 +21,14 @@ public class RecordGeneratorV2 {
         this.templateProcessor = templateProcessor;
     }
 
-    public void generate(String distinctionDirectory) throws IOException, TemplateException {
+    public void generate(String packageName, String distinctionDirectory) throws IOException, TemplateException {
         Map<String, Object> model = new HashMap<>();
 
-        // model.put("packageName", packageName);
-        // model.put("className", className);
-        // model.put("table", table.name());
-        // model.put("fields", fields);
+        model.put("packageName", packageName);
+        model.put("recordName", record.name());
+        model.put("tableName", record.tableName());
+        model.put("fields", record.fields());
 
-        Template template = templateProcessor.getTemplate("record.ftlh");
-
-        templateProcessor.process(model, "record.ftlh", "%s/%s.java".formatted(distinctionDirectory, record.name()));
-        // try (FileWriter fileWriter = new FileWriter()) {
-        //     template.process(model, fileWriter);
-        // }
+        templateProcessor.processRecordTemplate(model, "%s/%s.java".formatted(distinctionDirectory, record.name()));
     }
 }

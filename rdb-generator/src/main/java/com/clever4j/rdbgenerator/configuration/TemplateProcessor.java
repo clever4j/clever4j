@@ -37,6 +37,10 @@ public final class TemplateProcessor {
         }
     }
 
+    public void processRecordTemplate(Map<String, Object> model, String distinction) {
+        process(model, "record.ftlh", distinction);
+    }
+
     public void process(Map<String, Object> model, String template, String distinction) {
         try {
             Template template1 = configuration.getTemplate(template);

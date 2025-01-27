@@ -31,23 +31,25 @@ public class Main {
 
         CodeModelLoader codeModelLoader = new CodeModelLoader();
 
+        String packageName = "com.traisit.domain.database.test";
+
         CodeModel codeModel = codeModelLoader.load(
-            "com.traisit.domain.database.test",
+            packageName,
             connection,
             typeMapper,
             objectNameProvider
         );
 
         TemplateProcessor templateProcessor = new TemplateProcessor();
-        String distinctionDirectory = "/home/inspipi/desktop/traisit/traisit-core/src/main/java/com/traisit/domain/database/test";
+        String distinctionDirectory = "/home/workstati/desktop/traisit/traisit-core/src/main/java/com/traisit/domain/database/test";
 
         for (RecordModel record : codeModel.records()) {
-            if (!record.name().equals("test_tag")) {
+            if (!record.tableName().equals("test_tag")) {
                 continue;
             }
 
             RecordGeneratorV2 recordGenerator = new RecordGeneratorV2(record, templateProcessor);
-            recordGenerator.generate(distinctionDirectory);
+            recordGenerator.generate(packageName, distinctionDirectory);
         }
     }
 }

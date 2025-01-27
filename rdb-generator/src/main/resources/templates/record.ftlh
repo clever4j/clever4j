@@ -1,7 +1,7 @@
 package ${packageName};
 
-@jakarta.persistence.Table(name = "${table}")
-public record ${className}(
+@jakarta.persistence.Table(name = "${tableName}")
+public record ${recordName}(
 <#list fields as field>
     <#if field.primaryKey>@jakarta.persistence.Id</#if>
     <#if field.nullable>@jakarta.annotation.Nullable<#else>@jakarta.annotation.Nonnull</#if>

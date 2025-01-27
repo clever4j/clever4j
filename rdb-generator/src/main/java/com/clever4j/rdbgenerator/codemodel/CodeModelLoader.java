@@ -54,7 +54,6 @@ public final class CodeModelLoader {
             }
 
             records.add(new RecordModel(
-                packageName,
                 objectNameProvider.getRecordName(tableName),
                 tableName,
                 fields

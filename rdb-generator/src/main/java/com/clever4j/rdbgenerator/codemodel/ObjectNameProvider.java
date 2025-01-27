@@ -13,12 +13,10 @@ public final class ObjectNameProvider {
     }
 
     public String getFieldName(String columnName) {
-        return NAMING_STYLE_CONVERTER.convert(columnName, NamingStyleConverter.NamingStyle.PASCAL_CASE);
-
+        return NAMING_STYLE_CONVERTER.convert(columnName, NamingStyleConverter.NamingStyle.CAMEL_CASE);
     }
 
     public String getDaoName(RecordModel record) {
         return record.name() + "Dao";
-
     }
 }
