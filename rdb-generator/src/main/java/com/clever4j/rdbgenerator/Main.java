@@ -45,9 +45,9 @@ public class Main {
         String distinctionDirectory = "/home/workstati/desktop/traisit/traisit-core/src/main/java/com/traisit/domain/database/test";
 
         for (EntryCodeModel entry : codeModel.entries()) {
-            if (!entry.recordModel().tableName().equals("test_tag")) {
-                continue;
-            }
+            // if (!entry.recordModel().tableName().equals("test_tag")) {
+            //     continue;
+            // }
 
             RecordGenerator recordGenerator = new RecordGenerator(entry.recordModel(), templateProcessor);
             recordGenerator.generate(distinctionDirectory);
