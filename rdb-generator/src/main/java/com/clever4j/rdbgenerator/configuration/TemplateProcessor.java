@@ -1,20 +1,22 @@
 package com.clever4j.rdbgenerator.configuration;
 
 import com.clever4j.lang.AllNonnullByDefault;
-import freemarker.core.PlainTextOutputFormat;
 import freemarker.template.Configuration;
 import freemarker.template.Template;
+import freemarker.template.TemplateException;
 import freemarker.template.TemplateExceptionHandler;
 
+import java.io.FileWriter;
 import java.io.IOException;
+import java.util.Map;
 import java.util.TimeZone;
 
 @AllNonnullByDefault
-public final class TemplateConfiguration {
+public final class TemplateProcessor {
 
     private final Configuration configuration;
 
-    public TemplateConfiguration() {
+    public TemplateProcessor() {
         configuration = new Configuration(Configuration.VERSION_2_3_34);
 
         configuration.setClassForTemplateLoading(this.getClass(), "/templates/");
@@ -33,5 +35,20 @@ public final class TemplateConfiguration {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    public void process(Map<String, Object> model, String template, String distinction) {
+        try {
+            Template template1 = configuration.getTemplate(template);
+
+            try (FileWriter fileWriter = new FileWriter(distinction)) {
+                template1.process(model, fileWriter);
+            } catch (IOException | TemplateException e) {
+                throw new RuntimeException(e);
+            }
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
     }
 }

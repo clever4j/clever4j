@@ -6,7 +6,6 @@ import com.clever4j.lang.AllNonnullByDefault;
 public final class CodePartGenerator {
 
     public String generateCreateJavaType(Class<?> type, String value) {
-
         return "test";
     }
 }

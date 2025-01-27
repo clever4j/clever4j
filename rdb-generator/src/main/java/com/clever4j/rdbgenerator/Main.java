@@ -1,17 +1,17 @@
 package com.clever4j.rdbgenerator;
 
-import com.clever4j.rdb.metadata.MetadataProvider;
-import com.clever4j.rdb.metadata.Table;
-import com.clever4j.rdbgenerator.configuration.TemplateConfiguration;
-import com.clever4j.rdbgenerator.daogenerator.DaoGenerator;
-import com.clever4j.rdbgenerator.recordgenerator.RecordGenerator;
+import com.clever4j.rdbgenerator.codemodel.CodeModel;
+import com.clever4j.rdbgenerator.codemodel.CodeModelLoader;
+import com.clever4j.rdbgenerator.codemodel.ObjectNameProvider;
+import com.clever4j.rdbgenerator.codemodel.RecordModel;
+import com.clever4j.rdbgenerator.configuration.TemplateProcessor;
+import com.clever4j.rdbgenerator.recordgenerator.RecordGeneratorV2;
 import freemarker.template.TemplateException;
 
 import java.io.IOException;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
-import java.util.List;
 
 public class Main {
 
@@ -25,42 +25,29 @@ public class Main {
     }
 
     public static void main(String[] args) throws SQLException, IOException, TemplateException {
-        MetadataProvider metadataProvider = new MetadataProvider(getConnection());
+        Connection connection = getConnection();
         TypeMapper typeMapper = new TypeMapper();
+        ObjectNameProvider objectNameProvider = new ObjectNameProvider();
 
-        List<Table> tables = metadataProvider.getTables();
-        TemplateConfiguration templateConfiguration = new TemplateConfiguration();
-        String distinctionDirectory = "/home/workstati/desktop/traisit/traisit-core/src/main/java/com/traisit/domain/database/test";
+        CodeModelLoader codeModelLoader = new CodeModelLoader();
 
-        for (Table table : tables) {
-            if (!table.name().equals("test_tag")) {
+        CodeModel codeModel = codeModelLoader.load(
+            "com.traisit.domain.database.test",
+            connection,
+            typeMapper,
+            objectNameProvider
+        );
+
+        TemplateProcessor templateProcessor = new TemplateProcessor();
+        String distinctionDirectory = "/home/inspipi/desktop/traisit/traisit-core/src/main/java/com/traisit/domain/database/test";
+
+        for (RecordModel record : codeModel.records()) {
+            if (!record.name().equals("test_tag")) {
                 continue;
             }
 
-            // record
-            String packageName = "com.traisit.domain.database.test";
-
-            RecordGenerator recordGenerator = new RecordGenerator(
-                packageName,
-                table,
-                templateConfiguration,
-                typeMapper
-            );
-
+            RecordGeneratorV2 recordGenerator = new RecordGeneratorV2(record, templateProcessor);
             recordGenerator.generate(distinctionDirectory);
-
-            // dao
-            DaoGenerator daoGenerator = new DaoGenerator(
-                packageName,
-                table,
-                recordGenerator,
-                templateConfiguration,
-                typeMapper
-            );
-
-            daoGenerator.generate(distinctionDirectory);
-
-            break;
         }
     }
 }

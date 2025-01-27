@@ -3,7 +3,7 @@ package com.clever4j.rdbgenerator.daogenerator;
 import com.clever4j.lang.AllNonnullByDefault;
 import com.clever4j.rdb.metadata.Table;
 import com.clever4j.rdbgenerator.TypeMapper;
-import com.clever4j.rdbgenerator.configuration.TemplateConfiguration;
+import com.clever4j.rdbgenerator.configuration.TemplateProcessor;
 import com.clever4j.rdbgenerator.generators.CodePartGenerator;
 import com.clever4j.rdbgenerator.recordgenerator.RecordGenerator;
 import com.clever4j.rdbgenerator.recordgenerator.RecordGenerator.RecordField;
@@ -30,7 +30,7 @@ public class DaoGenerator {
     private static final NamingStyleConverter NAMING_STYLE_CONVERTER = new NamingStyleConverter();
 
     private final Table table;
-    private final TemplateConfiguration templateConfiguration;
+    private final TemplateProcessor templateProcessor;
     private final TypeMapper typeMapper;
     private final CodePartGenerator codePartGenerator = new CodePartGenerator();
 
@@ -38,10 +38,10 @@ public class DaoGenerator {
     private String className;
     private RecordGenerator recordGenerator;
 
-    public DaoGenerator(String packageName, Table table, RecordGenerator recordGenerator, TemplateConfiguration templateConfiguration, TypeMapper typeMapper) {
+    public DaoGenerator(String packageName, Table table, RecordGenerator recordGenerator, TemplateProcessor templateProcessor, TypeMapper typeMapper) {
         this.table = table;
         this.recordGenerator = recordGenerator;
-        this.templateConfiguration = templateConfiguration;
+        this.templateProcessor = templateProcessor;
         this.typeMapper = typeMapper;
 
         // load fields
@@ -91,7 +91,7 @@ public class DaoGenerator {
         // functions
         model.put("generateCreateJavaType", new GenerateCreateJavaType());
 
-        Template template = templateConfiguration.getTemplate("dao.ftlh");
+        Template template = templateProcessor.getTemplate("dao.ftlh");
 
         try (FileWriter fileWriter = new FileWriter("%s/%s.java".formatted(distinctionDirectory, className))) {
             template.process(model, fileWriter);
