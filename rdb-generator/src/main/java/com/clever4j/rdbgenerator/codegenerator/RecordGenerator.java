@@ -3,19 +3,17 @@ package com.clever4j.rdbgenerator.codegenerator;
 import com.clever4j.lang.AllNonnullByDefault;
 import com.clever4j.rdbgenerator.codemodel.RecordModel;
 import com.clever4j.rdbgenerator.configuration.TemplateProcessor;
-import freemarker.template.TemplateException;
 
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
 @AllNonnullByDefault
-public class RecordGeneratorV2 {
+public class RecordGenerator {
 
     private final RecordModel record;
     private final TemplateProcessor templateProcessor;
 
-    public RecordGeneratorV2(RecordModel record, TemplateProcessor templateProcessor) {
+    public RecordGenerator(RecordModel record, TemplateProcessor templateProcessor) {
         this.record = record;
         this.templateProcessor = templateProcessor;
     }

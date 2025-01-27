@@ -1,7 +1,7 @@
 package com.clever4j.rdbgenerator;
 
-import com.clever4j.rdbgenerator.codegenerator.DaoGeneratorV2;
-import com.clever4j.rdbgenerator.codegenerator.RecordGeneratorV2;
+import com.clever4j.rdbgenerator.codegenerator.DaoGenerator;
+import com.clever4j.rdbgenerator.codegenerator.RecordGenerator;
 import com.clever4j.rdbgenerator.codemodel.CodeModel;
 import com.clever4j.rdbgenerator.codemodel.CodeModelLoader;
 import com.clever4j.rdbgenerator.codemodel.EntryCodeModel;
@@ -49,14 +49,12 @@ public class Main {
                 continue;
             }
 
-            RecordGeneratorV2 recordGenerator = new RecordGeneratorV2(entry.recordModel(), templateProcessor);
+            RecordGenerator recordGenerator = new RecordGenerator(entry.recordModel(), templateProcessor);
             recordGenerator.generate(distinctionDirectory);
 
-            DaoGeneratorV2 daoGenerator = new DaoGeneratorV2(
+            DaoGenerator daoGenerator = new DaoGenerator(
                 entry.daoModel(),
-                recordGenerator,
-                templateProcessor,
-                typeMapper
+                templateProcessor
             );
 
             daoGenerator.generate(distinctionDirectory);

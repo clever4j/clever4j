@@ -46,6 +46,7 @@ public final class CodeModelLoader {
                     RecordFieldId.of(tableName, columnName),
                     typeMapper.map(typeName),
                     objectNameProvider.getFieldName(columnName),
+                    objectNameProvider.getByInName(columnName),
                     tableName,
                     columnName,
                     primaryKey,

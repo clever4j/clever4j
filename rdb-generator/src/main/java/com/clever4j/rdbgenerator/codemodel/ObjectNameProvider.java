@@ -16,6 +16,10 @@ public final class ObjectNameProvider {
         return NAMING_STYLE_CONVERTER.convert(columnName, NamingStyleConverter.NamingStyle.CAMEL_CASE);
     }
 
+    public String getByInName(String columnName) {
+        return "getBy" + NAMING_STYLE_CONVERTER.convert(columnName, NamingStyleConverter.NamingStyle.PASCAL_CASE) + "In";
+    }
+
     public String getDaoName(RecordModel record) {
         return NAMING_STYLE_CONVERTER.convert(record.tableName(), NamingStyleConverter.NamingStyle.PASCAL_CASE) + "Dao";
     }

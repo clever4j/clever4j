@@ -1,12 +1,9 @@
 package com.clever4j.rdbgenerator.codegenerator;
 
 import com.clever4j.lang.AllNonnullByDefault;
-import com.clever4j.rdbgenerator.TypeMapper;
 import com.clever4j.rdbgenerator.codemodel.DaoModel;
 import com.clever4j.rdbgenerator.codemodel.RecordField;
 import com.clever4j.rdbgenerator.configuration.TemplateProcessor;
-import com.clever4j.rdbgenerator.generators.CodePartGenerator;
-import com.clever4j.text.NamingStyleConverter;
 import freemarker.ext.beans.GenericObjectModel;
 import freemarker.template.TemplateMethodModelEx;
 import freemarker.template.TemplateModelException;
@@ -19,28 +16,17 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 
 @AllNonnullByDefault
-public class DaoGeneratorV2 {
-
-    private static final NamingStyleConverter NAMING_STYLE_CONVERTER = new NamingStyleConverter();
+public class DaoGenerator {
 
     private final DaoModel daoModel;
     private final TemplateProcessor templateProcessor;
-    private final TypeMapper typeMapper;
-    private final CodePartGenerator codePartGenerator = new CodePartGenerator();
 
-    private String className;
-    private RecordGeneratorV2 recordGenerator;
-
-    public DaoGeneratorV2(
+    public DaoGenerator(
         DaoModel daoModel,
-        RecordGeneratorV2 recordGenerator,
-        TemplateProcessor templateProcessor,
-        TypeMapper typeMapper
+        TemplateProcessor templateProcessor
     ) {
         this.daoModel = daoModel;
-        this.recordGenerator = recordGenerator;
         this.templateProcessor = templateProcessor;
-        this.typeMapper = typeMapper;
     }
 
     public void generate(String distinctionDirectory) {
@@ -91,7 +77,7 @@ public class DaoGeneratorV2 {
         templateProcessor.processDaoTemplate(model, "%s/%s.java".formatted(distinctionDirectory, daoModel.name()));
     }
 
-    private class GenerateCreateJavaType implements TemplateMethodModelEx {
+    private static class GenerateCreateJavaType implements TemplateMethodModelEx {
 
         @Override
         public Object exec(List arguments) throws TemplateModelException {
@@ -117,7 +103,7 @@ public class DaoGeneratorV2 {
         }
     }
 
-    private class SetStatementObject implements TemplateMethodModelEx {
+    private static class SetStatementObject implements TemplateMethodModelEx {
 
         @Override
         public Object exec(List arguments) throws TemplateModelException {

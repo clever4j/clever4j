@@ -8,6 +8,7 @@ public record RecordField(
     RecordFieldId recordFieldId,
     Class<?> type,
     String name,
+    String getByInName,
     String tableName,
     String columnName,
     boolean primaryKey,
