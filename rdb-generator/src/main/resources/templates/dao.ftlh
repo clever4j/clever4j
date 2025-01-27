@@ -9,14 +9,14 @@ import java.util.ArrayList;
 import java.util.List;
 
 @SuppressWarnings({"DataFlowIssue", "unused", "StringBufferReplaceableByString"})
-public class ${className} {
+public class ${name} {
 
     @jakarta.annotation.Nullable
-    public ${recordClassName} getById(${primaryKeyFieldParametersInline}, Connection connection) {
+    public ${recordName} getById(${primaryKeyFieldParametersInline}, Connection connection) {
         StringBuilder query = new StringBuilder();
         query.append("SELECT ${columnsInline} ");
         query.append("FROM ${tableName} ");
-        query.append("WHERE <#list primaryKeyFields as f>${f.column.name} = ?<#if f?has_next> AND </#if></#list> ");
+        query.append("WHERE <#list primaryKeyFields as f>${f.columnName} = ?<#if f?has_next> AND </#if></#list> ");
 
         try (PreparedStatement statement = connection.prepareStatement(query.toString())) {
             <#list primaryKeyFields as f>
@@ -30,7 +30,7 @@ public class ${className} {
         }
     }
 
-    public List<${recordClassName}> getAll(Connection connection) {
+    public List<${recordName}> getAll(Connection connection) {
         StringBuilder query = new StringBuilder();
 
         query.append("SELECT ${columnsInline} ");
@@ -39,14 +39,14 @@ public class ${className} {
         return executeQuery(query.toString(), connection);
     }
 
-    private List<${recordClassName}> executeQuery(String query, Connection connection) {
-        List<${recordClassName}> result = new ArrayList<>();
+    private List<${recordName}> executeQuery(String query, Connection connection) {
+        List<${recordName}> result = new ArrayList<>();
 
         try (PreparedStatement statement = connection.prepareStatement(query)) {
             ResultSet resultSet = statement.executeQuery();
 
             while (resultSet.next()) {
-                result.add(new ${recordClassName} (
+                result.add(new ${recordName} (
                 <#list recordFields as field>
                     ${generateCreateJavaType(field)}<#if field?has_next>,</#if>
                 </#list>
@@ -59,9 +59,9 @@ public class ${className} {
         }
     }
 
-    private ${recordClassName} mapResultSet(ResultSet resultSet) {
+    private ${recordName} mapResultSet(ResultSet resultSet) {
         try {
-            return new ${recordClassName} (
+            return new ${recordName} (
             <#list recordFields as field>
                 ${generateCreateJavaType(field)}<#if field?has_next>,</#if>
             </#list>
@@ -72,7 +72,7 @@ public class ${className} {
     }
 
     // INSERT ----------------------------------------------------------------------------------------------------------
-    public void insert(${recordClassName} record, Connection connection) {
+    public void insert(${recordName} record, Connection connection) {
         StringBuilder query = new StringBuilder();
         query.append("INSERT INTO ${tableName} (${columnsInline}) VALUES (${columnsQuestionMarkJoined})");
 
@@ -81,6 +81,22 @@ public class ${className} {
             statement.setObject(${f?index + 1}, record.${f.name}());
             </#list>
 
+            statement.execute();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    // DELETE ----------------------------------------------------------------------------------------------------------
+    public void delete(${primaryKeyFieldParametersInline}, Connection connection) {
+        StringBuilder query = new StringBuilder();
+        query.append("DELETE FROM ${tableName}");
+        query.append("WHERE <#list primaryKeyFields as f>${f.columnName} = ?<#if f?has_next> AND </#if></#list>");
+
+        try (PreparedStatement statement = connection.prepareStatement(query.toString())) {
+        <#list primaryKeyFields as f>
+            statement.setObject(${f?index + 1}, ${f.name});
+        </#list>
             statement.execute();
         } catch (SQLException e) {
             throw new RuntimeException(e);

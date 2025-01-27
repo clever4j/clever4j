@@ -7,6 +7,7 @@ import java.util.List;
 @AllNonnullByDefault
 public record RecordModel(
     String name,
+    String packageName,
     String tableName,
     List<RecordField> fields
 ) {

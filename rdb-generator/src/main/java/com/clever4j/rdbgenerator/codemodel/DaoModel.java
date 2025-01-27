@@ -6,6 +6,7 @@ import com.clever4j.lang.AllNonnullByDefault;
 public record DaoModel(
     String id,
     String name,
-    RecordModel record
+    String packageName,
+    RecordModel recordModel
 ) {
 }

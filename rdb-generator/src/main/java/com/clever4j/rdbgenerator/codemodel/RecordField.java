@@ -9,7 +9,7 @@ public record RecordField(
     Class<?> type,
     String name,
     String tableName,
-    String columName,
+    String columnName,
     boolean primaryKey,
     boolean nullable
 ) {

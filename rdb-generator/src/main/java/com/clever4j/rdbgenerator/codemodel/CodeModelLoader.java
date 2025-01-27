@@ -21,9 +21,9 @@ public final class CodeModelLoader {
 
     public CodeModel load(String packageName, Connection connection, TypeMapper typeMapper, ObjectNameProvider objectNameProvider) throws SQLException {
         DatabaseMetaData metadata = connection.getMetaData();
+        List<EntryCodeModel> entries = new ArrayList<>();
 
         ResultSet tableResultSet = metadata.getTables(connection.getCatalog(), null, "%", new String[]{"TABLE"});
-        List<RecordModel> records = new ArrayList<>();
 
         while (tableResultSet.next()) {
             String tableName = tableResultSet.getString("TABLE_NAME");
@@ -53,24 +53,24 @@ public final class CodeModelLoader {
                 ));
             }
 
-            records.add(new RecordModel(
+            RecordModel recordModel = new RecordModel(
                 objectNameProvider.getRecordName(tableName),
+                packageName,
                 tableName,
                 fields
-            ));
+            );
+
+            DaoModel daoModel = new DaoModel(
+                recordModel.name() + "-dao",
+                objectNameProvider.getDaoName(recordModel),
+                packageName,
+                recordModel
+            );
+
+            entries.add(new EntryCodeModel(recordModel, daoModel));
         }
 
-        // Daos
-        List<DaoModel> doas = records.stream()
-            .map(record -> {
-                return new DaoModel(
-                    record.name() + "-dao",
-                    record.name() + "Dao",
-                    record
-                );
-            }).toList();
-
-        return new CodeModel(records, doas);
+        return new CodeModel(entries);
     }
 
     private List<Column> getColumns(String tableName, DatabaseMetaData metaData) throws SQLException {

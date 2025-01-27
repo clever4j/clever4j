@@ -1,9 +1,8 @@
-package com.clever4j.rdbgenerator.recordgenerator;
+package com.clever4j.rdbgenerator.codegenerator;
 
 import com.clever4j.lang.AllNonnullByDefault;
 import com.clever4j.rdbgenerator.codemodel.RecordModel;
 import com.clever4j.rdbgenerator.configuration.TemplateProcessor;
-import freemarker.template.Template;
 import freemarker.template.TemplateException;
 
 import java.io.IOException;
@@ -21,11 +20,11 @@ public class RecordGeneratorV2 {
         this.templateProcessor = templateProcessor;
     }
 
-    public void generate(String packageName, String distinctionDirectory) throws IOException, TemplateException {
+    public void generate(String distinctionDirectory) {
         Map<String, Object> model = new HashMap<>();
 
-        model.put("packageName", packageName);
-        model.put("recordName", record.name());
+        model.put("packageName", record.packageName());
+        model.put("name", record.name());
         model.put("tableName", record.tableName());
         model.put("fields", record.fields());
 

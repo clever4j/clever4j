@@ -1,11 +1,12 @@
 package com.clever4j.rdbgenerator;
 
+import com.clever4j.rdbgenerator.codegenerator.DaoGeneratorV2;
+import com.clever4j.rdbgenerator.codegenerator.RecordGeneratorV2;
 import com.clever4j.rdbgenerator.codemodel.CodeModel;
 import com.clever4j.rdbgenerator.codemodel.CodeModelLoader;
+import com.clever4j.rdbgenerator.codemodel.EntryCodeModel;
 import com.clever4j.rdbgenerator.codemodel.ObjectNameProvider;
-import com.clever4j.rdbgenerator.codemodel.RecordModel;
 import com.clever4j.rdbgenerator.configuration.TemplateProcessor;
-import com.clever4j.rdbgenerator.recordgenerator.RecordGeneratorV2;
 import freemarker.template.TemplateException;
 
 import java.io.IOException;
@@ -24,7 +25,7 @@ public class Main {
         return DriverManager.getConnection(url, user, password);
     }
 
-    public static void main(String[] args) throws SQLException, IOException, TemplateException {
+    public static void main(String[] args) throws SQLException, TemplateException, IOException {
         Connection connection = getConnection();
         TypeMapper typeMapper = new TypeMapper();
         ObjectNameProvider objectNameProvider = new ObjectNameProvider();
@@ -43,13 +44,22 @@ public class Main {
         TemplateProcessor templateProcessor = new TemplateProcessor();
         String distinctionDirectory = "/home/workstati/desktop/traisit/traisit-core/src/main/java/com/traisit/domain/database/test";
 
-        for (RecordModel record : codeModel.records()) {
-            if (!record.tableName().equals("test_tag")) {
+        for (EntryCodeModel entry : codeModel.entries()) {
+            if (!entry.recordModel().tableName().equals("test_tag")) {
                 continue;
             }
 
-            RecordGeneratorV2 recordGenerator = new RecordGeneratorV2(record, templateProcessor);
-            recordGenerator.generate(packageName, distinctionDirectory);
+            RecordGeneratorV2 recordGenerator = new RecordGeneratorV2(entry.recordModel(), templateProcessor);
+            recordGenerator.generate(distinctionDirectory);
+
+            DaoGeneratorV2 daoGenerator = new DaoGeneratorV2(
+                entry.daoModel(),
+                recordGenerator,
+                templateProcessor,
+                typeMapper
+            );
+
+            daoGenerator.generate(distinctionDirectory);
         }
     }
 }
