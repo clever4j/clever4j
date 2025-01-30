@@ -17,7 +17,7 @@ public class ${name} {
         StringBuilder query = new StringBuilder();
         query.append("SELECT ${columnsInline} ");
         query.append("FROM ${tableName} ");
-        query.append("WHERE <#list primaryKeyFields as f>${f.columnName} = ?<#if f?has_next> AND </#if></#list> ");
+        query.append("WHERE <#list primaryKeyFields as f>${f.columnName} = ?<#if f?has_next> AND </#if></#list>");
 
         try (PreparedStatement statement = connection.prepareStatement(query.toString())) {
             <#list primaryKeyFields as f>
@@ -29,6 +29,16 @@ public class ${name} {
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    public ${recordName} requireById(${primaryKeyFieldParametersInline}, Connection connection) {
+        ${recordName} record = getById(<#list primaryKeyFields as f>${f.name()}<#if f?has_next>, </#if></#list>, connection);
+
+        if (record == null) {
+            throw new RuntimeException(String.format("Record <#list primaryKeyFields as f>%s<#if f?has_next>, </#if></#list> not found", <#list primaryKeyFields as f>${f.name()}<#if f?has_next>, </#if></#list>));
+        }
+
+        return record;
     }
 
 <#list recordFields as f>
@@ -147,6 +157,17 @@ public class ${name} {
         <#list primaryKeyFields as f>
             statement.setObject(${f?index + 1}, ${f.name});
         </#list>
+            statement.execute();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public void deleteAll(Connection connection) {
+        StringBuilder query = new StringBuilder();
+        query.append("DELETE FROM ${tableName}");
+
+        try (PreparedStatement statement = connection.prepareStatement(query.toString())) {
             statement.execute();
         } catch (SQLException e) {
             throw new RuntimeException(e);

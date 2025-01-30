@@ -32,7 +32,7 @@ public class Main {
 
         CodeModelLoader codeModelLoader = new CodeModelLoader();
 
-        String packageName = "com.traisit.domain.database.test";
+        String packageName = "com.traisit.domain.databasev2";
 
         CodeModel codeModel = codeModelLoader.load(
             packageName,
@@ -42,7 +42,7 @@ public class Main {
         );
 
         TemplateProcessor templateProcessor = new TemplateProcessor();
-        String distinctionDirectory = "/home/workstati/desktop/traisit/traisit-core/src/main/java/com/traisit/domain/database/test";
+        String distinctionDirectory = "/home/inspipi/desktop/traisit/traisit-core/src/main/java/com/traisit/domain/databasev2";
 
         for (EntryCodeModel entry : codeModel.entries()) {
             // if (!entry.recordModel().tableName().equals("test_tag")) {
