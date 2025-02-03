@@ -23,4 +23,8 @@ public final class ObjectNameProvider {
     public String getDaoName(RecordModel record) {
         return NAMING_STYLE_CONVERTER.convert(record.tableName(), NamingStyleConverter.NamingStyle.PASCAL_CASE) + "Dao";
     }
+
+    public String getWhereName(RecordModel record) {
+        return NAMING_STYLE_CONVERTER.convert(record.tableName(), NamingStyleConverter.NamingStyle.PASCAL_CASE) + "Where";
+    }
 }

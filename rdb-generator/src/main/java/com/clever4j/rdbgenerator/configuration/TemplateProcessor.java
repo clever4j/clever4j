@@ -41,6 +41,14 @@ public final class TemplateProcessor {
         process(model, "record.ftlh", distinction);
     }
 
+    public void processWhere(Map<String, Object> model, String distinction) {
+        process(model, "where.ftlh", distinction);
+    }
+
+    public void processWhereOperator(Map<String, Object> model, String distinction) {
+        process(model, "where-operator.ftlh", distinction);
+    }
+
     public void processDaoTemplate(Map<String, Object> model, String distinction) {
         process(model, "dao.ftlh", distinction);
     }

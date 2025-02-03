@@ -28,6 +28,10 @@ public final class CodeModelLoader {
         while (tableResultSet.next()) {
             String tableName = tableResultSet.getString("TABLE_NAME");
 
+            if (!tableName.equals("storage_object")) {
+                continue;
+            }
+
             // fields
             List<RecordField> fields = new ArrayList<>();
 
@@ -54,6 +58,7 @@ public final class CodeModelLoader {
                 ));
             }
 
+            // Record
             RecordModel recordModel = new RecordModel(
                 objectNameProvider.getRecordName(tableName),
                 packageName,
@@ -61,6 +66,15 @@ public final class CodeModelLoader {
                 fields
             );
 
+            // Where
+            WhereModel whereModel = new WhereModel(
+                objectNameProvider.getWhereName(recordModel),
+                packageName,
+                tableName,
+                fields
+            );
+
+            // Dao
             DaoModel daoModel = new DaoModel(
                 recordModel.name() + "-dao",
                 objectNameProvider.getDaoName(recordModel),
@@ -68,34 +82,10 @@ public final class CodeModelLoader {
                 recordModel
             );
 
-            entries.add(new EntryCodeModel(recordModel, daoModel));
+            entries.add(new EntryCodeModel(recordModel, whereModel, daoModel));
         }
 
-        return new CodeModel(entries);
-    }
-
-    private List<Column> getColumns(String tableName, DatabaseMetaData metaData) throws SQLException {
-        ResultSet resultSet = metaData.getColumns(null, null, tableName, null);
-        List<Column> columns = new ArrayList<>();
-
-        Set<String> primaryKeys = getPrimaryKeys(tableName, metaData);
-
-        while (resultSet.next()) {
-            String name = resultSet.getString("COLUMN_NAME");
-            String type = resultSet.getString("TYPE_NAME");
-
-            boolean primaryKey = primaryKeys.contains(name);
-            boolean isNullable = resultSet.getInt("NULLABLE") == DatabaseMetaData.columnNullable;
-
-            columns.add(new Column(
-                name,
-                primaryKey,
-                new DataType(type, Engine.POSTGRESQL),
-                isNullable
-            ));
-        }
-
-        return columns;
+        return new CodeModel(entries, new WhereOperatorModel("WhereOperator", packageName));
     }
 
     private Set<String> getPrimaryKeys(String tableName, DatabaseMetaData metaData) throws SQLException {
@@ -108,17 +98,5 @@ public final class CodeModelLoader {
         }
 
         return primaryKeys;
-    }
-
-    private String mapDbTypeToJavaType(String columnType) {
-        return switch (columnType) {
-            case "uuid" -> "java.lang.String";
-            case "timestamp" -> "java.time.LocalDateTime";
-            case "varchar" -> "java.lang.String";
-            case "text" -> "java.lang.String";
-            case "bool" -> "java.lang.Boolean";
-            case "int4" -> "java.lang.Integer";
-            default -> "java.lang.String";
-        };
     }
 }

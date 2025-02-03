@@ -2,6 +2,8 @@ package com.clever4j.rdbgenerator;
 
 import com.clever4j.rdbgenerator.codegenerator.DaoGenerator;
 import com.clever4j.rdbgenerator.codegenerator.RecordGenerator;
+import com.clever4j.rdbgenerator.codegenerator.WhereGenerator;
+import com.clever4j.rdbgenerator.codegenerator.WhereOperatorGenerator;
 import com.clever4j.rdbgenerator.codemodel.CodeModel;
 import com.clever4j.rdbgenerator.codemodel.CodeModelLoader;
 import com.clever4j.rdbgenerator.codemodel.EntryCodeModel;
@@ -42,13 +44,12 @@ public class Main {
         );
 
         TemplateProcessor templateProcessor = new TemplateProcessor();
-        String distinctionDirectory = "/home/inspipi/desktop/traisit/traisit-core/src/main/java/com/traisit/domain/databasev2";
+        String distinctionDirectory = "/home/workstati/desktop/traisit/traisit-core/src/main/java/com/traisit/domain/databasev2";
+
+        WhereOperatorGenerator whereOperatorGenerator = new WhereOperatorGenerator(codeModel.whereOperatorModel(), templateProcessor);
+        whereOperatorGenerator.generate(distinctionDirectory);
 
         for (EntryCodeModel entry : codeModel.entries()) {
-            // if (!entry.recordModel().tableName().equals("test_tag")) {
-            //     continue;
-            // }
-
             RecordGenerator recordGenerator = new RecordGenerator(entry.recordModel(), templateProcessor);
             recordGenerator.generate(distinctionDirectory);
 
@@ -58,6 +59,9 @@ public class Main {
             );
 
             daoGenerator.generate(distinctionDirectory);
+
+            WhereGenerator whereGenerator = new WhereGenerator(entry.whereModel(), templateProcessor);
+            whereGenerator.generate(distinctionDirectory);
         }
     }
 }

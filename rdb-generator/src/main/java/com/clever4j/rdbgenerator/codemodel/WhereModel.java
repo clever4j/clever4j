@@ -5,8 +5,10 @@ import com.clever4j.lang.AllNonnullByDefault;
 import java.util.List;
 
 @AllNonnullByDefault
-public record CodeModel(
-    List<EntryCodeModel> entries,
-    WhereOperatorModel whereOperatorModel
+public record WhereModel(
+    String name,
+    String packageName,
+    String tableName,
+    List<RecordField> fields
 ) {
 }
