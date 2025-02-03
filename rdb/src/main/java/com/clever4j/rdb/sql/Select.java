@@ -1,6 +1,7 @@
 package com.clever4j.rdb.sql;
 
 import com.clever4j.lang.AllNonnullByDefault;
+import jakarta.annotation.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -8,19 +9,54 @@ import java.util.List;
 @AllNonnullByDefault
 public final class Select {
 
-    private final List<Column> colums = new ArrayList<>();
-    private From from;
+    List<Column> columns = new ArrayList<>();
 
-    public Select(From from) {
-        this.from = from;
+    @Nullable
+    From from;
+
+    @Nullable
+    Where where;
+
+    private Select() {
+
     }
 
-    public Select (From from) {
-
+    public static Select build() {
+        return new Select();
     }
 
-    public Select from(From from) {
-        this.from = from;
+    // column ----------------------------------------------------------------------------------------------------------
+    public void column(String column) {
+        this.columns.add(new Column(Identifier.of(column), ""));
+    }
+
+    public void column(String column, String alias) {
+        this.columns.add(new Column(Identifier.of(column), alias));
+    }
+
+    public void clearColumns() {
+        this.columns.clear();
+    }
+
+    // where -----------------------------------------------------------------------------------------------------------
+    public Where where() {
+        where = new Where(LogicOperator.AND);
+        return where;
+    }
+
+    public Where where(LogicOperator operator) {
+        where = new Where(operator);
+        return where;
+    }
+
+    // from ------------------------------------------------------------------------------------------------------------
+    public Select from(String identifier) {
+        this.from = From.of(identifier);
+        return this;
+    }
+
+    public Select from(String identifier, String alias) {
+        this.from = From.of(identifier, alias);
         return this;
     }
 }

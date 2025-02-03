@@ -5,8 +5,8 @@ import com.clever4j.lang.AllNonnullByDefault;
 @AllNonnullByDefault
 public final class Column {
 
-    private final Expression value;
-    private final String alias;
+    final Expression value;
+    final String alias;
 
     Column(Expression value, String alias) {
         this.value = value;

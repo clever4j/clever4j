@@ -28,6 +28,9 @@ publishing {
 dependencies {
     implementation project(":core")
 
+    // junit
+    testImplementation 'org.junit.jupiter:junit-jupiter:5.11.4' // użyj najnowszej wersji
+
     // PostgreSQL
     runtimeOnly 'org.postgresql:postgresql'
     implementation 'org.postgresql:postgresql:42.7.3'
@@ -35,6 +38,8 @@ dependencies {
     implementation 'org.yaml:snakeyaml:2.3'
 
     implementation 'com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:2.18.2'
+
+    implementation 'jakarta.annotation:jakarta.annotation-api:3.0.0'
 }
 
 java {
