@@ -21,6 +21,5 @@ class PostgreSqlBuilderTest {
 
         String query = builder.build(select, context);
 
-        System.out.println(query);
     }
 }

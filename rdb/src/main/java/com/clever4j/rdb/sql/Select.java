@@ -17,7 +17,7 @@ public final class Select implements Expression {
     @Nullable
     Where where;
 
-    private Select() {
+    Select() {
 
     }
 
@@ -26,16 +26,19 @@ public final class Select implements Expression {
     }
 
     // column ----------------------------------------------------------------------------------------------------------
-    public void column(String column) {
-        this.columns.add(new Column(Identifier.of(column), ""));
+    public Select column(String column) {
+        columns.add(new Column(Identifier.of(column), ""));
+        return this;
     }
 
-    public void column(String column, String alias) {
-        this.columns.add(new Column(Identifier.of(column), alias));
+    public Select column(String column, String alias) {
+        columns.add(new Column(Identifier.of(column), alias));
+        return this;
     }
 
-    public void clearColumns() {
-        this.columns.clear();
+    public Select clearColumns() {
+        columns.clear();
+        return this;
     }
 
     // where -----------------------------------------------------------------------------------------------------------

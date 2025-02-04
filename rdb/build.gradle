@@ -3,7 +3,7 @@ plugins {
     id 'maven-publish'
 }
 
-group = 'com.clever4j.rdb'
+group = 'com.clever4j'
 version = '1.0.0'
 
 repositories {

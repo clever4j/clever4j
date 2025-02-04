@@ -50,7 +50,7 @@ public final class TemplateProcessor {
     }
 
     public void processDaoTemplate(Map<String, Object> model, String distinction) {
-        process(model, "dao.ftlh", distinction);
+        process(model, "dao-v2.ftlh", distinction);
     }
 
     public void process(Map<String, Object> model, String template, String distinction) {
