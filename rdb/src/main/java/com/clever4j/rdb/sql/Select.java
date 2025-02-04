@@ -7,7 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @AllNonnullByDefault
-public final class Select {
+public final class Select implements Expression {
 
     List<Column> columns = new ArrayList<>();
 

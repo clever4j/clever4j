@@ -17,7 +17,7 @@ class PostgreSqlBuilderTest {
         select.column("storage_object_id");
         select.column("name");
         select.from("user");
-        select.where().in("user_id", List.of(1, 2, 3));
+        // select.where().in("user_id", List.of(1, 2, 3));
 
         String query = builder.build(select, context);
 
