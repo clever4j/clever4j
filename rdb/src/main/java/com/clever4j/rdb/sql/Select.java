@@ -51,12 +51,12 @@ public final class Select implements Expression {
 
     // from ------------------------------------------------------------------------------------------------------------
     public Select from(String identifier) {
-        this.from = From.of(identifier);
+        this.from = new From(Identifier.of(identifier), "");
         return this;
     }
 
     public Select from(String identifier, String alias) {
-        this.from = From.of(identifier, alias);
+        this.from = new From(Identifier.of(identifier), alias);
         return this;
     }
 }

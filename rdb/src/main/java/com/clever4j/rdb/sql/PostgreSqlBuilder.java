@@ -17,6 +17,14 @@ public final class PostgreSqlBuilder {
     private void build(Expression expression, StringBuilder out, BuildContext context) throws SQLException {
         if (expression instanceof Select select) {
             buildSelect(select, out, context);
+        } else if (expression instanceof Identifier identifier) {
+            buildIdentifier(identifier, out, context);
+        } else if (expression instanceof Where where) {
+            buildWhere(where, out, context);
+        } else if (expression instanceof ValueExpression valueExpression) {
+            buildValueExpression(valueExpression, out, context);
+        } else if (expression instanceof ValuesExpression valuesExpression) {
+            buildValueExpression(valuesExpression, out, context);
         }
     }
 
@@ -42,26 +50,17 @@ public final class PostgreSqlBuilder {
         }
 
         out.append(" FROM ");
-        buildExpression(select.from.value, out, context);
+        build(select.from.value, out, context);
 
         if (!select.from.alias.isEmpty()) {
             out.append(" AS ").append(select.from.alias);
         }
 
         // where -------------------------------------------------------------------------------------------------------
-        // if (select.where != null) {
-        //     out.append(" WHERE ");
-        //     buildWhere(out, select.where, context);
-        // }
+        if (select.where != null) {
+            out.append(" WHERE ");
 
-        // if (!where.isEmpty()) {
-        //     query.append(" WHERE ").append(where.build(statementContext, qc));
-        // }
-    }
-
-    private void buildExpression(Expression expression, StringBuilder query, BuildContext context) {
-        if (expression instanceof Identifier identifier) {
-            buildIdentifier(identifier, query, context);
+            build(select.where, out, context);
         }
     }
 
@@ -75,23 +74,59 @@ public final class PostgreSqlBuilder {
         }
     }
 
-    private void buildWhere(Where where, StringBuilder query, BuildContext context) {
-        query.append(" (");
+    private void buildValueExpression(ValueExpression valueExpression, StringBuilder query, BuildContext context) {
+        query.append("?");
+        context.putStatementObjects(valueExpression.value);
+    }
 
+    private void buildValueExpression(ValuesExpression valuesExpression, StringBuilder query, BuildContext context) {
+        for (int i = 0; i < valuesExpression.values.size(); i++) {
+            Object value = valuesExpression.values.get(i);
+
+            query.append("?");
+            context.putStatementObjects(value);
+
+            if (i < valuesExpression.values.size() - 1) {
+                query.append(", ");
+            }
+        }
+    }
+
+    private void buildWhere(Where where, StringBuilder query, BuildContext context) throws SQLException {
         for (int i = 0; i < where.conditions.size(); i++) {
             Condition condition = where.conditions.get(i);
 
-            buildExpression(condition.operant(), query, context);
+            if (isWherePartBrackets(condition.left())) {
+                query.append(" (");
+                build(condition.left(), query, context);
+                query.append(")");
+            } else {
+                build(condition.left(), query, context);
+            }
 
-            // if (condition.operator().equals(RelationOperator.EQUAL)) {
-            //     query.append()
-            // }
+            if (condition.operator().equals(RelationOperator.EQUAL)) {
+                query.append(" = ");
+            } else if (condition.operator().equals(RelationOperator.IN)) {
+                query.append(" IN ");
+            }
 
-            // if (condition.operator().equals(RelationOperator.IN)) {
-            //     buildExpression(query, condition.operant());
-            // }
+            if (isWherePartBrackets(condition.right())) {
+                query.append(" (");
+                build(condition.right(), query, context);
+                query.append(")");
+            } else {
+                build(condition.right(), query, context);
+            }
+
+            if (i < where.conditions.size() - 1) {
+                query.append(" ").append(where.operator.name()).append(" ");
+            }
         }
+    }
 
-        query.append(")");
+    private boolean isWherePartBrackets(Expression expression) {
+        return expression instanceof Where ||
+            expression instanceof Select ||
+            expression instanceof ValuesExpression;
     }
 }

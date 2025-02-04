@@ -12,12 +12,4 @@ public final class From {
         this.value = value;
         this.alias = alias;
     }
-
-    public static From of(String identifier) {
-        return new From(Identifier.of(identifier), "");
-    }
-
-    public static From of(String identifier, String alias) {
-        return new From(Identifier.of(identifier), alias);
-    }
 }
