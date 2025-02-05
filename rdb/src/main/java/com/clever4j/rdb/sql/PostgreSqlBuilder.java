@@ -29,6 +29,10 @@ public final class PostgreSqlBuilder {
             buildValueExpression(valuesExpression, out, context);
         } else if (expression instanceof Insert insert) {
             buildInsert(insert, out, context);
+        } else if (expression instanceof Update update) {
+            buildUpdate(update, out, context);
+        } else if (expression instanceof Delete delete) {
+            buildDelete(delete, out, context);
         }
     }
 
@@ -82,7 +86,7 @@ public final class PostgreSqlBuilder {
         sql.append(" (");
 
         for (int i = 0; i < insert.columns.size(); i++) {
-            sql.append(insert.columns.get(i));
+            sql.append("\"").append(insert.columns.get(i)).append("\"");
 
             if (i < insert.columns.size() - 1) {
                 sql.append(", ");
@@ -108,6 +112,49 @@ public final class PostgreSqlBuilder {
         }
 
         sql.append(")");
+    }
+
+    private void buildUpdate(Update update, StringBuilder sql, BuildContext context) throws SQLException {
+        requireNonNull(update.table, "UPDATE table is not set.");
+
+        sql.append("UPDATE ");
+        buildIdentifier(update.table, sql, context);
+
+        // columns -----------------------------------------------------------------------------------------------------
+        if (update.columns.isEmpty()) {
+            throw new SQLException("INSERT set is empty.");
+        }
+
+        sql.append(" SET ");
+
+        for (int i = 0; i < update.columns.size(); i++) {
+            sql.append("\"").append(update.columns.get(i)).append("\"").append(" = ?");
+
+            context.addStatementObjects(update.values.get(i));
+
+            if (i < update.columns.size() - 1) {
+                sql.append(", ");
+            }
+        }
+
+        // where -------------------------------------------------------------------------------------------------------
+        if (update.where != null) {
+            sql.append(" WHERE ");
+            build(update.where, sql, context);
+        }
+    }
+
+    private void buildDelete(Delete delete, StringBuilder sql, BuildContext context) throws SQLException {
+        requireNonNull(delete.table, "DELETE table is not set.");
+
+        sql.append("DELETE FROM ");
+        buildIdentifier(delete.table, sql, context);
+
+        // where -------------------------------------------------------------------------------------------------------
+        if (delete.where != null) {
+            sql.append(" WHERE ");
+            build(delete.where, sql, context);
+        }
     }
 
     private void buildIdentifier(Identifier identifier, StringBuilder query, BuildContext context) {
