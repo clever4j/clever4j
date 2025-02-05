@@ -4,6 +4,7 @@ import org.junit.jupiter.api.Test;
 
 import java.sql.SQLException;
 import java.util.List;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class PostgreSqlBuilderTest {
@@ -21,8 +22,16 @@ class PostgreSqlBuilderTest {
         select.column("name");
         select.from("user");
         select.where().in("user_id", List.of(1, 2, 3));
+        select.orderBy()
+            .rule("name", OrderBy.OrderDirection.ASC);
 
-        String query = builder.build(select, context);
+        String sql = builder.build(select, context);
+
+        assertEquals("SELECT \"storage_object_id\", \"name\" FROM \"user\" WHERE \"user_id\" IN  (?, ?, ?) ORDER BY \"name\" ASC", sql);
+
+        assertEquals(1, context.getStatementObjects().get(0));
+        assertEquals(2, context.getStatementObjects().get(1));
+        assertEquals(3, context.getStatementObjects().get(2));
     }
 
     @Test
@@ -78,9 +87,7 @@ class PostgreSqlBuilderTest {
 
         String sql = builder.build(delete, context);
 
-        System.out.printf("test");
         assertEquals("DELETE FROM \"user\" WHERE \"user_id\" IN  (?, ?, ?)", sql);
-
         assertEquals(1, context.getStatementObjects().get(0));
         assertEquals(2, context.getStatementObjects().get(1));
         assertEquals(3, context.getStatementObjects().get(2));

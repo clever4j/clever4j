@@ -1,78 +1,86 @@
 package com.clever4j.rdb.sql;
 
 import com.clever4j.lang.AllNonnullByDefault;
+import com.clever4j.rdb.sql.OrderBy.OrderRule;
 import com.clever4j.rdb.sql.Where.Condition;
-
-import java.sql.SQLException;
 
 import static java.util.Objects.requireNonNull;
 
 @AllNonnullByDefault
 public final class PostgreSqlBuilder {
 
-    public String build(Expression expression, BuildContext context) throws SQLException {
-        StringBuilder out = new StringBuilder();
-        build(expression, out, context);
-        return out.toString();
+    public String build(Expression expression, BuildContext context) {
+        StringBuilder sql = new StringBuilder();
+        build(expression, sql, context);
+        return sql.toString();
     }
 
-    private void build(Expression expression, StringBuilder out, BuildContext context) throws SQLException {
+    private void build(Expression expression, StringBuilder sql, BuildContext context) {
         if (expression instanceof Select select) {
-            buildSelect(select, out, context);
+            buildSelect(select, sql, context);
         } else if (expression instanceof Identifier identifier) {
-            buildIdentifier(identifier, out, context);
+            buildIdentifier(identifier, sql, context);
         } else if (expression instanceof Where where) {
-            buildWhere(where, out, context);
+            buildWhere(where, sql, context);
         } else if (expression instanceof ValueExpression valueExpression) {
-            buildValueExpression(valueExpression, out, context);
+            buildValueExpression(valueExpression, sql, context);
         } else if (expression instanceof ValuesExpression valuesExpression) {
-            buildValueExpression(valuesExpression, out, context);
+            buildValueExpression(valuesExpression, sql, context);
         } else if (expression instanceof Insert insert) {
-            buildInsert(insert, out, context);
+            buildInsert(insert, sql, context);
         } else if (expression instanceof Update update) {
-            buildUpdate(update, out, context);
+            buildUpdate(update, sql, context);
         } else if (expression instanceof Delete delete) {
-            buildDelete(delete, out, context);
+            buildDelete(delete, sql, context);
+        } else if (expression instanceof OrderBy orderBy) {
+            buildOrderBy(orderBy, sql, context);
         }
     }
 
-    private void buildSelect(Select select, StringBuilder out, BuildContext context) throws SQLException {
+    private void buildSelect(Select select, StringBuilder sql, BuildContext context) {
         // columns -----------------------------------------------------------------------------------------------------
-        out.append("SELECT ");
+        sql.append("SELECT ");
 
         for (int i = 0; i < select.columns.size(); i++) {
-            if (i > 0) out.append(", ");
+            if (i > 0) sql.append(", ");
 
             Column column = select.columns.get(i);
 
-            build(column.value, out, context);
+            build(column.value, sql, context);
 
             if (!column.alias.isEmpty()) {
-                out.append(" AS ").append(column.alias);
+                sql.append(" AS ").append(column.alias);
             }
         }
 
         // from --------------------------------------------------------------------------------------------------------
         if (select.from == null) {
-            throw new SQLException("From is not set");
+            throw new BuildSqlException("From is not set");
         }
 
-        out.append(" FROM ");
-        build(select.from.value, out, context);
+        sql.append(" FROM ");
+        build(select.from.value, sql, context);
 
         if (!select.from.alias.isEmpty()) {
-            out.append(" AS ").append(select.from.alias);
+            sql.append(" AS ").append(select.from.alias);
         }
 
         // where -------------------------------------------------------------------------------------------------------
         if (select.where != null) {
-            out.append(" WHERE ");
+            sql.append(" WHERE ");
 
-            build(select.where, out, context);
+            build(select.where, sql, context);
+        }
+
+        // order by ----------------------------------------------------------------------------------------------------
+        if (select.orderBy != null) {
+            sql.append(" ORDER BY ");
+
+            buildOrderBy(select.orderBy, sql, context);
         }
     }
 
-    private void buildInsert(Insert insert, StringBuilder sql, BuildContext context) throws SQLException {
+    private void buildInsert(Insert insert, StringBuilder sql, BuildContext context) {
         requireNonNull(insert.into, "INTO set not in INSERT.");
 
         sql.append("INSERT INTO ");
@@ -80,7 +88,7 @@ public final class PostgreSqlBuilder {
 
         // columns -----------------------------------------------------------------------------------------------------
         if (insert.columns.isEmpty()) {
-            throw new SQLException("INSERT columns are empty.");
+            throw new BuildSqlException("INSERT columns are empty.");
         }
 
         sql.append(" (");
@@ -97,7 +105,7 @@ public final class PostgreSqlBuilder {
 
         // values -----------------------------------------------------------------------------------------------------
         if (insert.values.isEmpty()) {
-            throw new SQLException("INSERT values are empty.");
+            throw new BuildSqlException("INSERT values are empty.");
         }
 
         sql.append(" VALUES (");
@@ -114,7 +122,7 @@ public final class PostgreSqlBuilder {
         sql.append(")");
     }
 
-    private void buildUpdate(Update update, StringBuilder sql, BuildContext context) throws SQLException {
+    private void buildUpdate(Update update, StringBuilder sql, BuildContext context) {
         requireNonNull(update.table, "UPDATE table is not set.");
 
         sql.append("UPDATE ");
@@ -122,7 +130,7 @@ public final class PostgreSqlBuilder {
 
         // columns -----------------------------------------------------------------------------------------------------
         if (update.columns.isEmpty()) {
-            throw new SQLException("INSERT set is empty.");
+            throw new BuildSqlException("INSERT set is empty.");
         }
 
         sql.append(" SET ");
@@ -144,7 +152,7 @@ public final class PostgreSqlBuilder {
         }
     }
 
-    private void buildDelete(Delete delete, StringBuilder sql, BuildContext context) throws SQLException {
+    private void buildDelete(Delete delete, StringBuilder sql, BuildContext context) {
         requireNonNull(delete.table, "DELETE table is not set.");
 
         sql.append("DELETE FROM ");
@@ -185,7 +193,7 @@ public final class PostgreSqlBuilder {
         }
     }
 
-    private void buildWhere(Where where, StringBuilder query, BuildContext context) throws SQLException {
+    private void buildWhere(Where where, StringBuilder query, BuildContext context) {
         for (int i = 0; i < where.conditions.size(); i++) {
             Condition condition = where.conditions.get(i);
 
@@ -213,6 +221,19 @@ public final class PostgreSqlBuilder {
 
             if (i < where.conditions.size() - 1) {
                 query.append(" ").append(where.operator.name()).append(" ");
+            }
+        }
+    }
+
+    private void buildOrderBy(OrderBy orderBy, StringBuilder sql, BuildContext context) {
+        for (int i = 0; i < orderBy.orderRules.size(); i++) {
+            OrderRule rule = orderBy.orderRules.get(i);
+
+            build(rule.expression(), sql, context);
+            sql.append(" ").append(rule.direction().name());
+
+            if (i < orderBy.orderRules.size() - 1) {
+                sql.append(", ");
             }
         }
     }

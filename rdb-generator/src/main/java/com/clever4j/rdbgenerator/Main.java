@@ -44,10 +44,7 @@ public class Main {
         );
 
         TemplateProcessor templateProcessor = new TemplateProcessor();
-        String distinctionDirectory = "/home/workstati/desktop/traisit/traisit-core/src/main/java/com/traisit/domain/databasev2";
-
-        WhereOperatorGenerator whereOperatorGenerator = new WhereOperatorGenerator(codeModel.whereOperatorModel(), templateProcessor);
-        whereOperatorGenerator.generate(distinctionDirectory);
+        String distinctionDirectory = "/home/inspipi/desktop/traisit/traisit-core/src/main/java/com/traisit/domain/databasev2";
 
         for (EntryCodeModel entry : codeModel.entries()) {
             RecordGenerator recordGenerator = new RecordGenerator(entry.recordModel(), templateProcessor);
@@ -59,9 +56,6 @@ public class Main {
             );
 
             daoGenerator.generate(distinctionDirectory);
-
-            WhereGenerator whereGenerator = new WhereGenerator(entry.whereModel(), templateProcessor);
-            whereGenerator.generate(distinctionDirectory);
         }
     }
 }

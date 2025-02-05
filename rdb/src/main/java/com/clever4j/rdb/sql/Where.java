@@ -15,13 +15,13 @@ public final class Where implements Expression {
         this.operator = operator;
     }
 
-    public Where equal(Expression left, Object right) {
-        conditions.add(new Condition(left, RelationOperator.EQUAL, new ValueExpression(right)));
+    public Where equal(String identifier, Object value) {
+        conditions.add(new Condition(Identifier.of(identifier), RelationOperator.EQUAL, new ValueExpression(value)));
         return this;
     }
 
-    public Where in(String left, List<?> values) {
-        conditions.add(new Condition(Identifier.of(left), RelationOperator.IN, new ValuesExpression(values)));
+    public Where in(String identifier, List<?> values) {
+        conditions.add(new Condition(Identifier.of(identifier), RelationOperator.IN, new ValuesExpression(values)));
         return this;
     }
 
@@ -30,5 +30,9 @@ public final class Where implements Expression {
         RelationOperator operator,
         Expression right
     ) {
+    }
+
+    public interface WhereConfigurer {
+        void configure(Where where);
     }
 }

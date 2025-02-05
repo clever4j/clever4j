@@ -45,6 +45,16 @@ public final class Update implements Expression {
         return this.where;
     }
 
+    public Update where(Where.WhereConfigurer configurer) {
+        if (where == null) {
+            where = new Where(LogicOperator.AND);
+        }
+
+        configurer.configure(where);
+
+        return this;
+    }
+
     // -----------------------------------------------------------------------------------------------------------------
     public Update clear() {
         columns.clear();

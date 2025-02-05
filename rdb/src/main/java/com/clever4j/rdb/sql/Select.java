@@ -17,6 +17,9 @@ public final class Select implements Expression {
     @Nullable
     Where where;
 
+    @Nullable
+    OrderBy orderBy;
+
     Select() {
 
     }
@@ -41,17 +44,6 @@ public final class Select implements Expression {
         return this;
     }
 
-    // where -----------------------------------------------------------------------------------------------------------
-    public Where where() {
-        where = new Where(LogicOperator.AND);
-        return where;
-    }
-
-    public Where where(LogicOperator operator) {
-        where = new Where(operator);
-        return where;
-    }
-
     // from ------------------------------------------------------------------------------------------------------------
     public Select from(String identifier) {
         this.from = new From(Identifier.of(identifier), "");
@@ -61,5 +53,33 @@ public final class Select implements Expression {
     public Select from(String identifier, String alias) {
         this.from = new From(Identifier.of(identifier), alias);
         return this;
+    }
+
+    // where -----------------------------------------------------------------------------------------------------------
+    public Where where() {
+        if (where == null) {
+            where = new Where(LogicOperator.AND);
+        }
+
+        return where;
+    }
+
+    public Select where(Where.WhereConfigurer configurer) {
+        if (where == null) {
+            where = new Where(LogicOperator.AND);
+        }
+
+        configurer.configure(where);
+
+        return this;
+    }
+
+    // orderBy ---------------------------------------------------------------------------------------------------------
+    public OrderBy orderBy() {
+        if (orderBy == null) {
+            this.orderBy = new OrderBy();
+        }
+
+        return orderBy;
     }
 }
