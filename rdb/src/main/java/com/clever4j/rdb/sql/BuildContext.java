@@ -10,7 +10,11 @@ public class BuildContext {
 
     private final List<Object> statementObjects = new ArrayList<>();
 
-    public void putStatementObjects(Object value) {
+    public void addStatementObjects(Object value) {
         this.statementObjects.add(value);
+    }
+
+    public List<Object> getStatementObjects() {
+        return statementObjects;
     }
 }

@@ -5,6 +5,8 @@ import com.clever4j.rdb.sql.Where.Condition;
 
 import java.sql.SQLException;
 
+import static java.util.Objects.requireNonNull;
+
 @AllNonnullByDefault
 public final class PostgreSqlBuilder {
 
@@ -25,6 +27,8 @@ public final class PostgreSqlBuilder {
             buildValueExpression(valueExpression, out, context);
         } else if (expression instanceof ValuesExpression valuesExpression) {
             buildValueExpression(valuesExpression, out, context);
+        } else if (expression instanceof Insert insert) {
+            buildInsert(insert, out, context);
         }
     }
 
@@ -64,6 +68,48 @@ public final class PostgreSqlBuilder {
         }
     }
 
+    private void buildInsert(Insert insert, StringBuilder sql, BuildContext context) throws SQLException {
+        requireNonNull(insert.into, "INTO set not in INSERT.");
+
+        sql.append("INSERT INTO ");
+        buildIdentifier(insert.into, sql, context);
+
+        // columns -----------------------------------------------------------------------------------------------------
+        if (insert.columns.isEmpty()) {
+            throw new SQLException("INSERT columns are empty.");
+        }
+
+        sql.append(" (");
+
+        for (int i = 0; i < insert.columns.size(); i++) {
+            sql.append(insert.columns.get(i));
+
+            if (i < insert.columns.size() - 1) {
+                sql.append(", ");
+            }
+        }
+
+        sql.append(")");
+
+        // values -----------------------------------------------------------------------------------------------------
+        if (insert.values.isEmpty()) {
+            throw new SQLException("INSERT values are empty.");
+        }
+
+        sql.append(" VALUES (");
+
+        for (int i = 0; i < insert.values.size(); i++) {
+            sql.append("?");
+            context.addStatementObjects(insert.values.get(i));
+
+            if (i < insert.values.size() - 1) {
+                sql.append(", ");
+            }
+        }
+
+        sql.append(")");
+    }
+
     private void buildIdentifier(Identifier identifier, StringBuilder query, BuildContext context) {
         if (!identifier.qualifier.isEmpty() && !identifier.identifier.isEmpty()) {
             query.append("\"%s\".\"%s\"".formatted(identifier.qualifier, identifier.identifier));
@@ -76,7 +122,7 @@ public final class PostgreSqlBuilder {
 
     private void buildValueExpression(ValueExpression valueExpression, StringBuilder query, BuildContext context) {
         query.append("?");
-        context.putStatementObjects(valueExpression.value);
+        context.addStatementObjects(valueExpression.value);
     }
 
     private void buildValueExpression(ValuesExpression valuesExpression, StringBuilder query, BuildContext context) {
@@ -84,7 +130,7 @@ public final class PostgreSqlBuilder {
             Object value = valuesExpression.values.get(i);
 
             query.append("?");
-            context.putStatementObjects(value);
+            context.addStatementObjects(value);
 
             if (i < valuesExpression.values.size() - 1) {
                 query.append(", ");
