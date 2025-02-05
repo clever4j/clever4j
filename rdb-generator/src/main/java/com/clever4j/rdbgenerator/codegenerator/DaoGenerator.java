@@ -3,7 +3,7 @@ package com.clever4j.rdbgenerator.codegenerator;
 import com.clever4j.lang.AllNonnullByDefault;
 import com.clever4j.rdbgenerator.codemodel.DaoModel;
 import com.clever4j.rdbgenerator.codemodel.RecordField;
-import com.clever4j.rdbgenerator.configuration.TemplateProcessor;
+import com.clever4j.rdbgenerator.freemarker.TemplateProcessor;
 import freemarker.ext.beans.GenericObjectModel;
 import freemarker.template.TemplateMethodModelEx;
 import freemarker.template.TemplateModelException;

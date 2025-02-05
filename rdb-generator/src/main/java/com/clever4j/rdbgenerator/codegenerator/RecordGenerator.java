@@ -2,7 +2,7 @@ package com.clever4j.rdbgenerator.codegenerator;
 
 import com.clever4j.lang.AllNonnullByDefault;
 import com.clever4j.rdbgenerator.codemodel.RecordModel;
-import com.clever4j.rdbgenerator.configuration.TemplateProcessor;
+import com.clever4j.rdbgenerator.freemarker.TemplateProcessor;
 
 import java.util.HashMap;
 import java.util.Map;

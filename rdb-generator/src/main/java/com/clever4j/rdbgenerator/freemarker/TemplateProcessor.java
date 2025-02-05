@@ -1,4 +1,4 @@
-package com.clever4j.rdbgenerator.configuration;
+package com.clever4j.rdbgenerator.freemarker;
 
 import com.clever4j.lang.AllNonnullByDefault;
 import freemarker.template.Configuration;
