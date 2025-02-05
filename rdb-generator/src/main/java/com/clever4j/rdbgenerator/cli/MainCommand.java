@@ -1,5 +1,7 @@
 package com.clever4j.rdbgenerator.cli;
 
+import com.clever4j.rdbgenerator.configuration.Configuration;
+import com.clever4j.rdbgenerator.services.Services;
 import picocli.CommandLine;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Option;
@@ -12,8 +14,8 @@ import java.util.concurrent.Callable;
     version = "1.0.0")
 public final class MainCommand implements Callable<Integer> {
 
-    @Option(names = {"--file"}, description = "Generator configuration file.")
-    private Path file = Path.of("./clever4j-rdb-generator.yaml");
+    @Option(names = {"--configuration-file"}, description = "Generator configuration file.")
+    private Path configurationFile = Path.of("./clever4j-rdb-generator.yaml");
 
     public static void main(String... args) {
         int exitCode = new CommandLine(new MainCommand()).execute(args);
@@ -23,7 +25,10 @@ public final class MainCommand implements Callable<Integer> {
 
     @Override
     public Integer call() throws Exception {
-        System.out.printf("migrate");
+        Configuration configuration = new Configuration(configurationFile);
+
+        Services.setConfiguration(configuration);
+
         return 0;
     }
 
