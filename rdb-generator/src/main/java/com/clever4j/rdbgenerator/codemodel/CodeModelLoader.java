@@ -1,14 +1,14 @@
 package com.clever4j.rdbgenerator.codemodel;
 
 import com.clever4j.lang.AllNonnullByDefault;
-import com.clever4j.rdb.metadata.Column;
-import com.clever4j.rdb.metadata.DataType;
-import com.clever4j.rdb.metadata.Engine;
-import com.clever4j.rdbgenerator.TypeMapper;
 import com.clever4j.rdbgenerator.codemodel.types.RecordFieldId;
+import com.clever4j.rdbgenerator.configuration.Configuration.Config.Repository;
+import jakarta.annotation.Nullable;
 
+import java.io.Closeable;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
+import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -17,17 +17,32 @@ import java.util.List;
 import java.util.Set;
 
 @AllNonnullByDefault
-public final class CodeModelLoader {
+public final class CodeModelLoader implements Closeable {
 
-    public CodeModel load(String packageName, Connection connection, TypeMapper typeMapper, ObjectNameProvider objectNameProvider) throws SQLException {
+    private final Repository repository;
+
+    @Nullable
+    private Connection connection;
+
+    public CodeModelLoader(Repository repository) {
+        this.repository = repository;
+    }
+
+    public CodeModel load() throws SQLException {
+        Connection connection = getConnection();
         DatabaseMetaData metadata = connection.getMetaData();
         List<EntryCodeModel> entries = new ArrayList<>();
+        TypeMapper typeMapper = new TypeMapper();
+        ObjectNameProvider objectNameProvider = new ObjectNameProvider();
 
         ResultSet tableResultSet = metadata.getTables(connection.getCatalog(), null, "%", new String[]{"TABLE"});
+
+        String excludeRegex = repository.getRecordGenerator().getExcludeRegex();
 
         while (tableResultSet.next()) {
             String tableName = tableResultSet.getString("TABLE_NAME");
 
+            // todo
             if (!tableName.equals("storage_object")) {
                 continue;
             }
@@ -61,31 +76,25 @@ public final class CodeModelLoader {
             // Record
             RecordModel recordModel = new RecordModel(
                 objectNameProvider.getRecordName(tableName),
-                packageName,
+                repository.getRecordGenerator().getPackageName(),
                 tableName,
                 fields
             );
 
-            // Where
-            WhereModel whereModel = new WhereModel(
-                objectNameProvider.getWhereName(recordModel),
-                packageName,
-                tableName,
-                fields
-            );
+            // // Dao
+            // DaoModel daoModel = new DaoModel(
+            //     recordModel.name() + "-dao",
+            //     objectNameProvider.getDaoName(recordModel),
+            //     packageName,
+            //     recordModel
+            // );
 
-            // Dao
-            DaoModel daoModel = new DaoModel(
-                recordModel.name() + "-dao",
-                objectNameProvider.getDaoName(recordModel),
-                packageName,
-                recordModel
-            );
-
-            entries.add(new EntryCodeModel(recordModel, whereModel, daoModel));
+            entries.add(new EntryCodeModel(recordModel, null, null));
         }
 
-        return new CodeModel(entries, new WhereOperatorModel("WhereOperator", packageName));
+        // return new CodeModel(entries, new WhereOperatorModel("WhereOperator", packageName));
+
+        return null;
     }
 
     private Set<String> getPrimaryKeys(String tableName, DatabaseMetaData metaData) throws SQLException {
@@ -98,5 +107,30 @@ public final class CodeModelLoader {
         }
 
         return primaryKeys;
+    }
+
+    private Connection getConnection() throws SQLException {
+        if (connection == null) {
+            connection = DriverManager.getConnection(
+                repository.getDbUrl(),
+                repository.getDbUser(),
+                repository.getDbPassword()
+            );
+        }
+
+        return connection;
+    }
+
+    @Override
+    public void close() {
+        if (connection == null) {
+            return;
+        }
+
+        try {
+            connection.close();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
     }
 }

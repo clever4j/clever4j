@@ -1,6 +1,9 @@
 package com.clever4j.rdbgenerator.cli;
 
+import com.clever4j.rdbgenerator.codegenerator.GeneratorExecutor;
+import com.clever4j.rdbgenerator.codemodel.CodeModelLoader;
 import com.clever4j.rdbgenerator.configuration.Configuration;
+import com.clever4j.rdbgenerator.configuration.Configuration.Config.Repository;
 import com.clever4j.rdbgenerator.services.Services;
 import picocli.CommandLine;
 import picocli.CommandLine.Command;
@@ -29,17 +32,18 @@ public final class MainCommand implements Callable<Integer> {
 
         Services.setConfiguration(configuration);
 
+        // Executor ----------------------------------------------------------------------------------------------------
+        for (Repository repository : configuration.getRepositories()) {
+            CodeModelLoader codeModelLoader = new CodeModelLoader(repository);
+
+            codeModelLoader.load();
+
+            // GeneratorExecutor generatorExecutor = new GeneratorExecutor(repository);
+            // generatorExecutor.run();
+        }
+
         return 0;
     }
-
-    // // Metoda do połączenia z bazą danych
-    // private static Connection getConnection() throws SQLException {
-    //     String url = "jdbc:postgresql://localhost:5432/traisit_db";
-    //     String user = "traisit_db";
-    //     String password = "traisit_db";
-
-    //     return DriverManager.getConnection(url, user, password);
-    // }
 
     // public static void main(String[] args) throws SQLException, TemplateException, IOException {
     //     Connection connection = getConnection();

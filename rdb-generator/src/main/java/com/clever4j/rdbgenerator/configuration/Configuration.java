@@ -1,6 +1,7 @@
 package com.clever4j.rdbgenerator.configuration;
 
 import com.clever4j.lang.AllNonnullByDefault;
+import com.clever4j.rdbgenerator.configuration.Configuration.Config.Repository;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
@@ -13,28 +14,20 @@ import java.util.List;
 public class Configuration {
 
     private final Path file;
+    private final List<Repository> repositories;
 
     public Configuration(Path file) throws IOException {
         this.file = file;
 
+        // Load config
         ObjectMapper mapper = new ObjectMapper(new YAMLFactory());
-
         Config config = mapper.readValue(file.toFile(), Config.class);
 
-        System.out.println("test");
+        this.repositories = config.repositories;
     }
 
-    public static void main(String[] args) throws IOException {
-        // Yaml yaml = new Yaml();
-
-        // try (InputStream inputStream = Files.newInputStream(Path.of("/home/inspipi/desktop/clever4j/rdb/src/main/resources/rdb-generator.yaml"))) {
-        //     Map<String, Object> data = yaml.load(inputStream);
-        //     System.out.println(data);
-        // } catch (IOException e) {
-        //     throw new RuntimeException(e);
-        // }
-
-        // System.out.println(config);
+    public List<Repository> getRepositories() {
+        return repositories;
     }
 
     public static class Config {
@@ -75,6 +68,15 @@ public class Configuration {
 
             private String id;
 
+            @JsonProperty("db-url")
+            private String dbUrl;
+
+            @JsonProperty("db-user")
+            private String dbUser;
+
+            @JsonProperty("db-password")
+            private String dbPassword;
+
             @JsonProperty("record-generator")
             private RecordGenerator recordGenerator;
 
@@ -90,6 +92,30 @@ public class Configuration {
 
             public void setId(String id) {
                 this.id = id;
+            }
+
+            public String getDbUrl() {
+                return dbUrl;
+            }
+
+            public void setDbUrl(String dbUrl) {
+                this.dbUrl = dbUrl;
+            }
+
+            public String getDbUser() {
+                return dbUser;
+            }
+
+            public void setDbUser(String dbUser) {
+                this.dbUser = dbUser;
+            }
+
+            public String getDbPassword() {
+                return dbPassword;
+            }
+
+            public void setDbPassword(String dbPassword) {
+                this.dbPassword = dbPassword;
             }
 
             public RecordGenerator getRecordGenerator() {
@@ -119,7 +145,40 @@ public class Configuration {
 
         public static class RecordGenerator {
 
+            @JsonProperty("package-name")
+            private String packageName;
+
+            @JsonProperty("output")
+            private String output;
+
+            @JsonProperty("exclude-regex")
+            private String excludeRegex;
+
             private List<Data> records;
+
+            public String getPackageName() {
+                return packageName;
+            }
+
+            public void setPackageName(String packageName) {
+                this.packageName = packageName;
+            }
+
+            public String getOutput() {
+                return output;
+            }
+
+            public void setOutput(String output) {
+                this.output = output;
+            }
+
+            public String getExcludeRegex() {
+                return excludeRegex;
+            }
+
+            public void setExcludeRegex(String excludeRegex) {
+                this.excludeRegex = excludeRegex;
+            }
 
             public List<Data> getRecords() {
                 return records;

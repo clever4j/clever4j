@@ -47,6 +47,8 @@ dependencies {
     // https://mvnrepository.com/artifact/info.picocli/picocli
     implementation 'info.picocli:picocli:4.7.6'
 
+    implementation 'jakarta.annotation:jakarta.annotation-api:3.0.0'
+
     implementation project(":rdb")
 }
 
