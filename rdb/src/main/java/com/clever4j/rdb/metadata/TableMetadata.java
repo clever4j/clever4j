@@ -5,9 +5,9 @@ import com.clever4j.lang.AllNonnullByDefault;
 import java.util.List;
 
 @AllNonnullByDefault
-public record Table(
+public record TableMetadata(
     String name,
     Engine engine,
-    List<Column> columns
+    List<ColumnMetadata> columns
 ) {
 }

@@ -1,8 +1,10 @@
 package com.clever4j.rdbgenerator.codemodel;
 
 import com.clever4j.lang.AllNonnullByDefault;
-import com.clever4j.rdbgenerator.codemodel.types.RecordFieldId;
-import com.clever4j.rdbgenerator.configuration.Configuration.Config.Repository;
+import com.clever4j.rdb.metadata.ColumnMetadata;
+import com.clever4j.rdb.metadata.DatabaseMetadata;
+import com.clever4j.rdb.metadata.TableMetadata;
+import com.clever4j.rdbgenerator.configuration.Repository;
 import jakarta.annotation.Nullable;
 
 import java.io.Closeable;
@@ -20,81 +22,83 @@ import java.util.Set;
 public final class CodeModelLoader implements Closeable {
 
     private final Repository repository;
+    private final DatabaseMetadata databaseMetadata;
 
     @Nullable
     private Connection connection;
 
-    public CodeModelLoader(Repository repository) {
+    public CodeModelLoader(Repository repository, DatabaseMetadata databaseMetadata) {
         this.repository = repository;
+        this.databaseMetadata = databaseMetadata;
     }
 
     public CodeModel load() throws SQLException {
         Connection connection = getConnection();
         DatabaseMetaData metadata = connection.getMetaData();
-        List<EntryCodeModel> entries = new ArrayList<>();
         TypeMapper typeMapper = new TypeMapper();
         ObjectNameProvider objectNameProvider = new ObjectNameProvider();
+        List<Record> records = new ArrayList<>();
+        List<DaoModel> daos = new ArrayList<>();
 
-        ResultSet tableResultSet = metadata.getTables(connection.getCatalog(), null, "%", new String[]{"TABLE"});
-
-        String excludeRegex = repository.getRecordGenerator().getExcludeRegex();
-
-        while (tableResultSet.next()) {
-            String tableName = tableResultSet.getString("TABLE_NAME");
-
-            // todo
-            if (!tableName.equals("storage_object")) {
+        for (TableMetadata table : databaseMetadata.tables()) {
+            if (!table.name().equals("test_tag")) {
                 continue;
             }
 
-            // fields
+            if (isTableExcluded(table.name())) {
+                continue;
+            }
+
+            // fields --------------------------------------------------------------------------------------------------
             List<RecordField> fields = new ArrayList<>();
 
-            ResultSet columnResultSet = metadata.getColumns(null, null, tableName, null);
-
-            Set<String> primaryKeys = getPrimaryKeys(tableName, metadata);
-
-            while (columnResultSet.next()) {
-                String columnName = columnResultSet.getString("COLUMN_NAME");
-                String typeName = columnResultSet.getString("TYPE_NAME");
-
-                boolean primaryKey = primaryKeys.contains(columnName);
-                boolean nullable = columnResultSet.getInt("NULLABLE") == DatabaseMetaData.columnNullable;
-
+            for (ColumnMetadata column : table.columns()) {
                 fields.add(new RecordField(
-                    RecordFieldId.of(tableName, columnName),
-                    typeMapper.map(typeName),
-                    objectNameProvider.getFieldName(columnName),
-                    objectNameProvider.getByInName(columnName),
-                    tableName,
-                    columnName,
-                    primaryKey,
-                    nullable
+                    typeMapper.map(column.type()),
+                    objectNameProvider.getFieldName(column.name()),
+                    objectNameProvider.getByInName(column.name()),
+                    table.name(),
+                    column.name(),
+                    column.primaryKey(),
+                    column.nullable()
                 ));
             }
 
-            // Record
-            RecordModel recordModel = new RecordModel(
-                objectNameProvider.getRecordName(tableName),
-                repository.getRecordGenerator().getPackageName(),
-                tableName,
+            // record --------------------------------------------------------------------------------------------------
+            String recordPackageName = repository.getRecordGenerator().getPackageName();
+            String recordSimpleName = objectNameProvider.getRecordName(table.name());
+            String recordName = recordPackageName + "." + recordSimpleName;
+
+            Record record = new Record(
+                recordName,
+                recordSimpleName,
+                recordPackageName,
+                table,
                 fields
             );
 
+            records.add(record);
+
             // // Dao
             // DaoModel daoModel = new DaoModel(
-            //     recordModel.name() + "-dao",
-            //     objectNameProvider.getDaoName(recordModel),
+            //     record.name() + "-dao",
+            //     objectNameProvider.getDaoName(record),
             //     packageName,
-            //     recordModel
+            //     record
             // );
-
-            entries.add(new EntryCodeModel(recordModel, null, null));
         }
 
-        // return new CodeModel(entries, new WhereOperatorModel("WhereOperator", packageName));
+        return new CodeModel(records, daos);
+    }
 
-        return null;
+    private boolean isTableExcluded(String tableName) {
+        // if (repository.getRecordGenerator().getExcludeRegex()) {
+
+        // }
+
+        System.out.printf("test");
+
+        return false;
     }
 
     private Set<String> getPrimaryKeys(String tableName, DatabaseMetaData metaData) throws SQLException {

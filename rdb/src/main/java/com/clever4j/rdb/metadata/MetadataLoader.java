@@ -13,33 +13,37 @@ import java.util.List;
 import java.util.Set;
 
 @AllNonnullByDefault
-public final class MetadataProvider {
+public final class MetadataLoader {
 
     private final Connection connection;
 
-    public MetadataProvider(Connection connection) {
+    public MetadataLoader(Connection connection) {
         this.connection = connection;
     }
 
-    public List<Table> getTables() throws SQLException {
+    public DatabaseMetadata load() throws SQLException {
+        return new DatabaseMetadata(getTables());
+    }
+
+    public List<TableMetadata> getTables() throws SQLException {
         DatabaseMetaData metaData = connection.getMetaData();
 
         ResultSet resultSet = metaData.getTables(connection.getCatalog(), null, "%", new String[]{"TABLE"});
-        List<Table> tables = new ArrayList<>();
+        List<TableMetadata> tableMetadata = new ArrayList<>();
 
         while (resultSet.next()) {
             String tableName = resultSet.getString("TABLE_NAME");
-            List<Column> columns = getColumns(tableName, metaData);
+            List<ColumnMetadata> columns = getColumns(tableName, metaData);
 
-            tables.add(new Table(tableName, Engine.POSTGRESQL, Collections.unmodifiableList(columns)));
+            tableMetadata.add(new TableMetadata(tableName, Engine.POSTGRESQL, Collections.unmodifiableList(columns)));
         }
 
-        return tables;
+        return tableMetadata;
     }
 
-    private List<Column> getColumns(String tableName, DatabaseMetaData metaData) throws SQLException {
+    private List<ColumnMetadata> getColumns(String tableName, DatabaseMetaData metaData) throws SQLException {
         ResultSet resultSet = metaData.getColumns(null, null, tableName, null);
-        List<Column> columns = new ArrayList<>();
+        List<ColumnMetadata> columnMetadata = new ArrayList<>();
 
         Set<String> primaryKeys = getPrimaryKeys(tableName, metaData);
 
@@ -50,15 +54,10 @@ public final class MetadataProvider {
             boolean primaryKey = primaryKeys.contains(name);
             boolean isNullable = resultSet.getInt("NULLABLE") == DatabaseMetaData.columnNullable;
 
-            columns.add(new Column(
-                name,
-                primaryKey,
-                new DataType(type, Engine.POSTGRESQL),
-                isNullable
-            ));
+            columnMetadata.add(new ColumnMetadata(name, primaryKey, type, isNullable));
         }
 
-        return columns;
+        return columnMetadata;
     }
 
     private Set<String> getPrimaryKeys(String tableName, DatabaseMetaData metaData) throws SQLException {
@@ -71,17 +70,5 @@ public final class MetadataProvider {
         }
 
         return primaryKeys;
-    }
-
-    private String mapDbTypeToJavaType(String columnType) {
-        return switch (columnType) {
-            case "uuid" -> "java.lang.String";
-            case "timestamp" -> "java.time.LocalDateTime";
-            case "varchar" -> "java.lang.String";
-            case "text" -> "java.lang.String";
-            case "bool" -> "java.lang.Boolean";
-            case "int4" -> "java.lang.Integer";
-            default -> "java.lang.String";
-        };
     }
 }

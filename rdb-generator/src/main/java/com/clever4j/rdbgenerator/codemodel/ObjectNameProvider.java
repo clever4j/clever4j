@@ -20,11 +20,11 @@ public final class ObjectNameProvider {
         return "getBy" + NAMING_STYLE_CONVERTER.convert(columnName, NamingStyleConverter.NamingStyle.PASCAL_CASE) + "In";
     }
 
-    public String getDaoName(RecordModel record) {
-        return NAMING_STYLE_CONVERTER.convert(record.tableName(), NamingStyleConverter.NamingStyle.PASCAL_CASE) + "Dao";
+    public String getDaoName(Record record) {
+        return NAMING_STYLE_CONVERTER.convert(record.table().name(),NamingStyleConverter.NamingStyle.PASCAL_CASE) + "Dao";
     }
 
-    public String getWhereName(RecordModel record) {
-        return NAMING_STYLE_CONVERTER.convert(record.tableName(), NamingStyleConverter.NamingStyle.PASCAL_CASE) + "Where";
+    public String getWhereName(Record record) {
+        return NAMING_STYLE_CONVERTER.convert(record.table().name(), NamingStyleConverter.NamingStyle.PASCAL_CASE) + "Where";
     }
 }

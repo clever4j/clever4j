@@ -2,11 +2,11 @@ package com.clever4j.rdb.metadata;
 
 import com.clever4j.lang.AllNonnullByDefault;
 
+import java.util.List;
+
 @AllNonnullByDefault
-public record Column(
-    String name,
-    boolean primaryKey,
-    DataType type,
-    boolean nullable
+public record DatabaseMetadata(
+    List<TableMetadata> tables
 ) {
+
 }

@@ -1,4 +1,4 @@
-package com.clever4j.rdbgenerator.codegenerator;
+package com.clever4j.rdbgenerator.repositorycodegenerator;
 
 import com.clever4j.lang.AllNonnullByDefault;
 import com.clever4j.rdbgenerator.codemodel.DaoModel;
@@ -34,19 +34,19 @@ public class DaoGenerator {
 
         model.put("packageName", daoModel.packageName());
         model.put("name", daoModel.name());
-        model.put("tableName", daoModel.recordModel().tableName());
-        model.put("recordName", daoModel.recordModel().name());
-        model.put("recordFields", daoModel.recordModel().fields());
+        model.put("tableName", daoModel.record().table().name());
+        model.put("recordName", daoModel.record().name());
+        model.put("recordFields", daoModel.record().fields());
 
-        model.put("recordFieldsSize", daoModel.recordModel().fields().size());
+        model.put("recordFieldsSize", daoModel.record().fields().size());
 
-        List<RecordField> primaryKeyFields = daoModel.recordModel().fields().stream()
+        List<RecordField> primaryKeyFields = daoModel.record().fields().stream()
             .filter(RecordField::primaryKey)
             .toList();
 
         model.put("primaryKeyFields", primaryKeyFields);
 
-        String primaryKeyFieldParametersInline = daoModel.recordModel().fields().stream()
+        String primaryKeyFieldParametersInline = daoModel.record().fields().stream()
             .filter(RecordField::primaryKey)
             .map(recordField -> {
                 return "%s %s".formatted(recordField.type().getCanonicalName(), recordField.name());
@@ -55,7 +55,7 @@ public class DaoGenerator {
         model.put("primaryKeyFieldParametersInline", primaryKeyFieldParametersInline);
 
         // columnsInline
-        String columnsInline = daoModel.recordModel().fields().stream()
+        String columnsInline = daoModel.record().fields().stream()
             .map(recordField -> {
                 return "\\\"%s\\\"".formatted(recordField.columnName());
             }).collect(Collectors.joining(", "));
@@ -63,7 +63,7 @@ public class DaoGenerator {
         model.put("columnsInline", columnsInline);
 
         // columnsQuestionMarkJoined
-        String columnsQuestionMarkJoined = daoModel.recordModel().fields().stream()
+        String columnsQuestionMarkJoined = daoModel.record().fields().stream()
             .map(recordField -> {
                 return "?";
             }).collect(Collectors.joining(", "));

@@ -1,8 +1,8 @@
 package com.clever4j.rdbgenerator.services;
 
 import com.clever4j.lang.AllNonnullByDefault;
-import com.clever4j.rdbgenerator.codegenerator.GeneratorExecutor;
 import com.clever4j.rdbgenerator.configuration.Configuration;
+import com.clever4j.rdbgenerator.freemarker.TemplateProcessor;
 import jakarta.annotation.Nullable;
 
 @AllNonnullByDefault
@@ -10,6 +10,9 @@ public final class Services {
 
     @Nullable
     private static Configuration configuration;
+
+    @Nullable
+    private static TemplateProcessor templateProcessor;
 
     public static void setConfiguration(Configuration configuration) {
         Services.configuration = configuration;
@@ -21,6 +24,14 @@ public final class Services {
         }
 
         return configuration;
+    }
+
+    public static TemplateProcessor templateProcessor() {
+        if (templateProcessor == null) {
+            templateProcessor = new TemplateProcessor();
+        }
+
+        return templateProcessor;
     }
 
     // public static GeneratorExecutor generatorExecutor() {

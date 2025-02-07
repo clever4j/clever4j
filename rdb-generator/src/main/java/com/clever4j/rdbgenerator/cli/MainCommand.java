@@ -1,15 +1,21 @@
 package com.clever4j.rdbgenerator.cli;
 
-import com.clever4j.rdbgenerator.codegenerator.GeneratorExecutor;
+import com.clever4j.rdb.metadata.DatabaseMetadata;
+import com.clever4j.rdb.metadata.MetadataLoader;
+import com.clever4j.rdbgenerator.repositorycodegenerator.RepositoryCodeGenerator;
+import com.clever4j.rdbgenerator.codemodel.CodeModel;
 import com.clever4j.rdbgenerator.codemodel.CodeModelLoader;
 import com.clever4j.rdbgenerator.configuration.Configuration;
-import com.clever4j.rdbgenerator.configuration.Configuration.Config.Repository;
+import com.clever4j.rdbgenerator.configuration.Repository;
 import com.clever4j.rdbgenerator.services.Services;
 import picocli.CommandLine;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Option;
 
 import java.nio.file.Path;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.SQLException;
 import java.util.concurrent.Callable;
 
 @Command(name = "clever4j-rdb-generator",
@@ -34,15 +40,37 @@ public final class MainCommand implements Callable<Integer> {
 
         // Executor ----------------------------------------------------------------------------------------------------
         for (Repository repository : configuration.getRepositories()) {
-            CodeModelLoader codeModelLoader = new CodeModelLoader(repository);
+            Connection connection = getConnection(repository);
 
-            codeModelLoader.load();
+            MetadataLoader metadataLoader = new MetadataLoader(connection);
+            DatabaseMetadata databaseMetadata = metadataLoader.load();
 
-            // GeneratorExecutor generatorExecutor = new GeneratorExecutor(repository);
-            // generatorExecutor.run();
+            // for (TableMetadata table : databaseMetadata.tables()) {
+            //     if (!table.name().equals("test_tag")) {
+            //         continue;
+            //     }
+            // }
+
+            CodeModelLoader codeModelLoader = new CodeModelLoader(repository, databaseMetadata);
+            CodeModel codeModel = codeModelLoader.load();
+
+            RepositoryCodeGenerator repositoryCodeGenerator = new RepositoryCodeGenerator(
+                repository,
+                codeModel
+            );
+
+            repositoryCodeGenerator.run();
         }
 
         return 0;
+    }
+
+    private Connection getConnection(Repository repository) throws SQLException {
+        return DriverManager.getConnection(
+            repository.getDbUrl(),
+            repository.getDbUser(),
+            repository.getDbPassword()
+        );
     }
 
     // public static void main(String[] args) throws SQLException, TemplateException, IOException {
@@ -65,7 +93,7 @@ public final class MainCommand implements Callable<Integer> {
     //     String distinctionDirectory = "/home/inspipi/desktop/traisit/traisit-core/src/main/java/com/traisit/domain/databasev2";
 
     //     for (EntryCodeModel entry : codeModel.entries()) {
-    //         RecordGenerator recordGenerator = new RecordGenerator(entry.recordModel(), templateProcessor);
+    //         RecordGenerator recordGenerator = new RecordGenerator(entry.record(), templateProcessor);
     //         recordGenerator.generate(distinctionDirectory);
 
     //         DaoGenerator daoGenerator = new DaoGenerator(
