@@ -6,26 +6,83 @@ import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 
 import java.io.IOException;
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.List;
 
 @AllNonnullByDefault
 public class Configuration {
 
-    private final Path file;
-    private final List<Repository> repositories;
+    private Path file;
+    private List<Repository> repositories = new ArrayList<>();
 
     public Configuration(Path file) throws IOException {
         this.file = file;
 
-        // Load config
-        ObjectMapper mapper = new ObjectMapper(new YAMLFactory());
-        Clever4jRdbGenerator config = mapper.readValue(file.toFile(), Clever4jRdbGenerator.class);
+        load();
+    }
 
-        this.repositories = config.getRepositories();
+    private void load() throws IOException {
+        ObjectMapper mapper = new ObjectMapper(new YAMLFactory());
+
+        Clever4jRdbGenerator clever4jRdbGenerator = mapper.readValue(file.toFile(), Clever4jRdbGenerator.class);
+
+        // repositories ------------------------------------------------------------------------------------------------
+        if (clever4jRdbGenerator.repositories() == null || clever4jRdbGenerator.repositories().isEmpty()) {
+            throw new RuntimeException("At least one repository is required");
+        }
+
+        for (Clever4jRdbGenerator.Repository repository : clever4jRdbGenerator.repositories()) {
+            if (repository.id() == null || repository.id().isEmpty()) {
+                throw new IllegalArgumentException("repository id is required");
+            }
+
+            if (repository.dbUrl() == null || repository.dbUrl().isEmpty()) {
+                throw new IllegalArgumentException("repository.%s.dbUrl is required".formatted(repository.id()));
+            }
+
+            if (repository.dbUser() == null || repository.dbUser().isEmpty()) {
+                throw new IllegalArgumentException("repository.%s.dbUser is required".formatted(repository.id()));
+            }
+
+            if (repository.dbPassword() == null || repository.dbPassword().isEmpty()) {
+                throw new IllegalArgumentException("repository.%s.dbPassword is required".formatted(repository.id()));
+            }
+
+            // recordGenerator
+            Clever4jRdbGenerator.Repository.RecordGenerator recordGenerator = repository.recordGenerator();
+
+            if (recordGenerator == null) {
+                throw new IllegalArgumentException("repository.%s.recordGenerator is required".formatted(repository.id()));
+            }
+
+            if (recordGenerator.packageName() == null || recordGenerator.packageName().isEmpty()) {
+                throw new IllegalArgumentException("repository.%s.recordGenerator.packageName is required".formatted(repository.id()));
+            }
+
+            if (recordGenerator.output() == null || recordGenerator.output().isEmpty()) {
+                throw new IllegalArgumentException("repository.%s.recordGenerator.output is required".formatted(repository.id()));
+            }
+
+            Path recordGeneratorOutput = Path.of(recordGenerator.output());
+
+            if (!recordGeneratorOutput.isAbsolute()) {
+                recordGeneratorOutput = file.getParent().resolve(recordGeneratorOutput);
+            }
+
+            repositories.add(new Repository(
+                repository.id(),
+                repository.dbUrl(),
+                repository.dbUser(),
+                repository.dbPassword(),
+                new RecordGenerator(
+                    recordGenerator.packageName(),
+                    recordGeneratorOutput
+                )
+            ));
+        }
     }
 
     public List<Repository> getRepositories() {
         return repositories;
     }
-
 }

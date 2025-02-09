@@ -8,11 +8,7 @@ import com.clever4j.rdbgenerator.configuration.Repository;
 import jakarta.annotation.Nullable;
 
 import java.io.Closeable;
-import java.sql.Connection;
-import java.sql.DatabaseMetaData;
-import java.sql.DriverManager;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -65,7 +61,7 @@ public final class CodeModelLoader implements Closeable {
             }
 
             // record --------------------------------------------------------------------------------------------------
-            String recordPackageName = repository.getRecordGenerator().getPackageName();
+            String recordPackageName = repository.recordGenerator().packageName();
             String recordSimpleName = objectNameProvider.getRecordName(table.name());
             String recordName = recordPackageName + "." + recordSimpleName;
 
@@ -116,9 +112,9 @@ public final class CodeModelLoader implements Closeable {
     private Connection getConnection() throws SQLException {
         if (connection == null) {
             connection = DriverManager.getConnection(
-                repository.getDbUrl(),
-                repository.getDbUser(),
-                repository.getDbPassword()
+                repository.dbUrl(),
+                repository.dbUser(),
+                repository.dbPassword()
             );
         }
 

@@ -2,12 +2,12 @@ package com.clever4j.rdbgenerator.cli;
 
 import com.clever4j.rdb.metadata.DatabaseMetadata;
 import com.clever4j.rdb.metadata.MetadataLoader;
-import com.clever4j.rdbgenerator.freemarker.TemplateProcessor;
-import com.clever4j.rdbgenerator.repositorycodegenerator.RepositoryCodeGenerator;
 import com.clever4j.rdbgenerator.codemodel.CodeModel;
 import com.clever4j.rdbgenerator.codemodel.CodeModelLoader;
 import com.clever4j.rdbgenerator.configuration.Configuration;
 import com.clever4j.rdbgenerator.configuration.Repository;
+import com.clever4j.rdbgenerator.freemarker.TemplateProcessor;
+import com.clever4j.rdbgenerator.repositorycodegenerator.RepositoryCodeGenerator;
 import com.clever4j.rdbgenerator.services.Services;
 import picocli.CommandLine;
 import picocli.CommandLine.Command;
@@ -66,41 +66,9 @@ public final class MainCommand implements Callable<Integer> {
 
     private Connection getConnection(Repository repository) throws SQLException {
         return DriverManager.getConnection(
-            repository.getDbUrl(),
-            repository.getDbUser(),
-            repository.getDbPassword()
+            repository.dbUrl(),
+            repository.dbUser(),
+            repository.dbPassword()
         );
     }
-
-    // public static void main(String[] args) throws SQLException, TemplateException, IOException {
-    //     Connection connection = getConnection();
-    //     TypeMapper typeMapper = new TypeMapper();
-    //     ObjectNameProvider objectNameProvider = new ObjectNameProvider();
-
-    //     CodeModelLoader codeModelLoader = new CodeModelLoader();
-
-    //     String packageName = "com.traisit.domain.databasev2";
-
-    //     CodeModel codeModel = codeModelLoader.load(
-    //         packageName,
-    //         connection,
-    //         typeMapper,
-    //         objectNameProvider
-    //     );
-
-    //     TemplateProcessor templateProcessor = new TemplateProcessor();
-    //     String distinctionDirectory = "/home/inspipi/desktop/traisit/traisit-core/src/main/java/com/traisit/domain/databasev2";
-
-    //     for (EntryCodeModel entry : codeModel.entries()) {
-    //         RecordGenerator recordGenerator = new RecordGenerator(entry.record(), templateProcessor);
-    //         recordGenerator.generate(distinctionDirectory);
-
-    //         DaoGenerator daoGenerator = new DaoGenerator(
-    //             entry.daoModel(),
-    //             templateProcessor
-    //         );
-
-    //         daoGenerator.generate(distinctionDirectory);
-    //     }
-    // }
 }

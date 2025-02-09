@@ -24,9 +24,7 @@ public final class RepositoryCodeGenerator {
     public void run() {
         // records -----------------------------------------------------------------------------------------------------
         for (RecordModel record : codeModel.records()) {
-            Path output = Path.of(repository.getRecordGenerator().getOutput());
-
-            RecordGenerator recordGenerator = new RecordGenerator(record, output, templateProcessor);
+            RecordGenerator recordGenerator = new RecordGenerator(record, repository.recordGenerator().output(), templateProcessor);
             recordGenerator.generate();
         }
 
