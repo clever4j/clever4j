@@ -6,8 +6,6 @@ import com.clever4j.rdbgenerator.codemodel.RecordModel;
 import com.clever4j.rdbgenerator.configuration.Repository;
 import com.clever4j.rdbgenerator.freemarker.TemplateProcessor;
 
-import java.nio.file.Path;
-
 @AllNonnullByDefault
 public final class RepositoryCodeGenerator {
 
@@ -22,12 +20,15 @@ public final class RepositoryCodeGenerator {
     }
 
     public void run() {
+
         // records -----------------------------------------------------------------------------------------------------
         for (RecordModel record : codeModel.records()) {
-            RecordGenerator recordGenerator = new RecordGenerator(record, repository.recordGenerator().output(), templateProcessor);
-            recordGenerator.generate();
-        }
+            RecordGenerator recordGenerator = new RecordGenerator(record, repository.recordGenerator().output(),
+                templateProcessor);
 
-        System.out.printf("test");
+            recordGenerator.generate();
+
+
+        }
     }
 }

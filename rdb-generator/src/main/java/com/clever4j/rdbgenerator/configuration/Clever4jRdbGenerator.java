@@ -60,5 +60,14 @@ public record Clever4jRdbGenerator(
                 }
             }
         }
+
+        public record DaoGenerator(
+            @JsonProperty("package-name")
+            String packageName,
+
+            @JsonProperty("output")
+            String output
+        ) {
+        }
     }
 }
