@@ -2,7 +2,7 @@ package com.clever4j.rdbgenerator.repositorycodegenerator;
 
 import com.clever4j.lang.AllNonnullByDefault;
 import com.clever4j.rdbgenerator.codemodel.DaoModel;
-import com.clever4j.rdbgenerator.codemodel.RecordField;
+import com.clever4j.rdbgenerator.codemodel.RecordFieldModel;
 import com.clever4j.rdbgenerator.freemarker.TemplateProcessor;
 import freemarker.ext.beans.GenericObjectModel;
 import freemarker.template.TemplateMethodModelEx;
@@ -40,14 +40,14 @@ public class DaoGenerator {
 
         model.put("recordFieldsSize", daoModel.record().fields().size());
 
-        List<RecordField> primaryKeyFields = daoModel.record().fields().stream()
-            .filter(RecordField::primaryKey)
+        List<RecordFieldModel> primaryKeyFields = daoModel.record().fields().stream()
+            .filter(RecordFieldModel::primaryKey)
             .toList();
 
         model.put("primaryKeyFields", primaryKeyFields);
 
         String primaryKeyFieldParametersInline = daoModel.record().fields().stream()
-            .filter(RecordField::primaryKey)
+            .filter(RecordFieldModel::primaryKey)
             .map(recordField -> {
                 return "%s %s".formatted(recordField.type().getCanonicalName(), recordField.name());
             }).collect(Collectors.joining(", "));
@@ -81,7 +81,7 @@ public class DaoGenerator {
 
         @Override
         public Object exec(List arguments) throws TemplateModelException {
-            RecordField field = (RecordField) ((GenericObjectModel) arguments.getFirst()).getWrappedObject();
+            RecordFieldModel field = (RecordFieldModel) ((GenericObjectModel) arguments.getFirst()).getWrappedObject();
 
             if (field.type().equals(int.class) || field.type().equals(Integer.class)) {
                 return "resultSet.getInt(\"%s\")".formatted(field.columnName());

@@ -7,6 +7,6 @@ public record DaoModel(
     String id,
     String name,
     String packageName,
-    Record record
+    RecordModel record
 ) {
 }

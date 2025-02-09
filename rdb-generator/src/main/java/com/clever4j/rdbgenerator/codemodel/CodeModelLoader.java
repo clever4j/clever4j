@@ -37,7 +37,7 @@ public final class CodeModelLoader implements Closeable {
         DatabaseMetaData metadata = connection.getMetaData();
         TypeMapper typeMapper = new TypeMapper();
         ObjectNameProvider objectNameProvider = new ObjectNameProvider();
-        List<Record> records = new ArrayList<>();
+        List<RecordModel> records = new ArrayList<>();
         List<DaoModel> daos = new ArrayList<>();
 
         for (TableMetadata table : databaseMetadata.tables()) {
@@ -50,10 +50,10 @@ public final class CodeModelLoader implements Closeable {
             }
 
             // fields --------------------------------------------------------------------------------------------------
-            List<RecordField> fields = new ArrayList<>();
+            List<RecordFieldModel> fields = new ArrayList<>();
 
             for (ColumnMetadata column : table.columns()) {
-                fields.add(new RecordField(
+                fields.add(new RecordFieldModel(
                     typeMapper.map(column.type()),
                     objectNameProvider.getFieldName(column.name()),
                     objectNameProvider.getByInName(column.name()),
@@ -69,7 +69,7 @@ public final class CodeModelLoader implements Closeable {
             String recordSimpleName = objectNameProvider.getRecordName(table.name());
             String recordName = recordPackageName + "." + recordSimpleName;
 
-            Record record = new Record(
+            RecordModel record = new RecordModel(
                 recordName,
                 recordSimpleName,
                 recordPackageName,

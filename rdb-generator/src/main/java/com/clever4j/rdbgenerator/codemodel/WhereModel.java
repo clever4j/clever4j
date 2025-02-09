@@ -9,6 +9,6 @@ public record WhereModel(
     String name,
     String packageName,
     String tableName,
-    List<RecordField> fields
+    List<RecordFieldModel> fields
 ) {
 }

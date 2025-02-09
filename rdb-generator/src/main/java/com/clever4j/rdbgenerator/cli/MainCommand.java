@@ -2,6 +2,7 @@ package com.clever4j.rdbgenerator.cli;
 
 import com.clever4j.rdb.metadata.DatabaseMetadata;
 import com.clever4j.rdb.metadata.MetadataLoader;
+import com.clever4j.rdbgenerator.freemarker.TemplateProcessor;
 import com.clever4j.rdbgenerator.repositorycodegenerator.RepositoryCodeGenerator;
 import com.clever4j.rdbgenerator.codemodel.CodeModel;
 import com.clever4j.rdbgenerator.codemodel.CodeModelLoader;
@@ -38,6 +39,8 @@ public final class MainCommand implements Callable<Integer> {
 
         Services.setConfiguration(configuration);
 
+        TemplateProcessor templateProcessor = Services.templateProcessor();
+
         // Executor ----------------------------------------------------------------------------------------------------
         for (Repository repository : configuration.getRepositories()) {
             Connection connection = getConnection(repository);
@@ -54,11 +57,7 @@ public final class MainCommand implements Callable<Integer> {
             CodeModelLoader codeModelLoader = new CodeModelLoader(repository, databaseMetadata);
             CodeModel codeModel = codeModelLoader.load();
 
-            RepositoryCodeGenerator repositoryCodeGenerator = new RepositoryCodeGenerator(
-                repository,
-                codeModel
-            );
-
+            RepositoryCodeGenerator repositoryCodeGenerator = new RepositoryCodeGenerator(repository, codeModel, templateProcessor);
             repositoryCodeGenerator.run();
         }
 

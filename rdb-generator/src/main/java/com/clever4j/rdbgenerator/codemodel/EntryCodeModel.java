@@ -4,7 +4,7 @@ import com.clever4j.lang.AllNonnullByDefault;
 
 @AllNonnullByDefault
 public record EntryCodeModel(
-    Record record,
+    RecordModel record,
     WhereModel whereModel,
     DaoModel daoModel
 ) {

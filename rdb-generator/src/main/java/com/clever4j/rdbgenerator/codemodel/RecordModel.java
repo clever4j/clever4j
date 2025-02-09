@@ -6,11 +6,11 @@ import com.clever4j.rdb.metadata.TableMetadata;
 import java.util.List;
 
 @AllNonnullByDefault
-public record Record(
+public record RecordModel(
     String name,
     String simpleName,
     String packageName,
     TableMetadata table,
-    List<RecordField> fields
+    List<RecordFieldModel> fields
 ) {
 }
