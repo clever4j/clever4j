@@ -4,6 +4,7 @@ import com.clever4j.lang.AllNonnullByDefault;
 import com.clever4j.rdb.metadata.ColumnMetadata;
 import com.clever4j.rdb.metadata.DatabaseMetadata;
 import com.clever4j.rdb.metadata.TableMetadata;
+import com.clever4j.rdbgenerator.configuration.DaoGenerator;
 import com.clever4j.rdbgenerator.configuration.Repository;
 import jakarta.annotation.Nullable;
 
@@ -75,13 +76,20 @@ public final class CodeModelLoader implements Closeable {
 
             records.add(record);
 
-            // // Dao
-            // DaoModel daoModel = new DaoModel(
-            //     record.name() + "-dao",
-            //     objectNameProvider.getDaoName(record),
-            //     packageName,
-            //     record
-            // );
+            if (repository.daoGenerator() != null) {
+                DaoGenerator daoGenerator = repository.daoGenerator();
+
+                String name = daoGenerator.packageName() + "." + objectNameProvider.getDaoSimpleName(record);
+                String packageName = daoGenerator.packageName();
+                String simpleName = objectNameProvider.getDaoSimpleName(record);
+
+                daos.add(new DaoModel(
+                    name,
+                    packageName,
+                    simpleName,
+                    record
+                ));
+            }
         }
 
         return new CodeModel(records, daos);

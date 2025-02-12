@@ -2,197 +2,34 @@
 package ${packageName};
 
 import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 @SuppressWarnings({"DataFlowIssue", "unused", "StringBufferReplaceableByString", "DuplicatedCode"})
-public class ${name} {
+public interface ${simpleName} {
+
+    List<${recordName}> getAll();
+
+    List<${recordName}> getAll(Connection connection);
 
     @jakarta.annotation.Nullable
-    public ${recordName} getById(${primaryKeyFieldParametersInline}, Connection connection) {
-        StringBuilder query = new StringBuilder();
-        query.append("SELECT ${columnsInline} ");
-        query.append("FROM ${tableName} ");
-        query.append("WHERE <#list primaryKeyFields as f>${f.columnName} = ?<#if f?has_next> AND </#if></#list>");
+    ${recordName} getById(${primaryKeyFieldParametersInline});
 
-        try (PreparedStatement statement = connection.prepareStatement(query.toString())) {
-            <#list primaryKeyFields as f>
-            statement.setObject(${f?index + 1}, ${f.name});
-            </#list>
+    @jakarta.annotation.Nullable
+    ${recordName} getById(${primaryKeyFieldParametersInline}, Connection connection);
 
-            ResultSet resultSet = statement.executeQuery();
-            return resultSet.next() ? mapResultSet(resultSet) : null;
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
-    }
+    void insert(${recordName} record);
 
-    public ${recordName} requireById(${primaryKeyFieldParametersInline}, Connection connection) {
-        ${recordName} record = getById(<#list primaryKeyFields as f>${f.name()}<#if f?has_next>, </#if></#list>, connection);
+    void insert(${recordName} record, Connection connection);
 
-        if (record == null) {
-            throw new RuntimeException(String.format("Record <#list primaryKeyFields as f>%s<#if f?has_next>, </#if></#list> not found", <#list primaryKeyFields as f>${f.name()}<#if f?has_next>, </#if></#list>));
-        }
+    void delete(${primaryKeyFieldParametersInline});
 
-        return record;
-    }
+    void delete(${primaryKeyFieldParametersInline}, Connection connection);
 
-<#list recordFields as f>
-    public List<${recordName}> ${f.getByInName()}(${f.type.getCanonicalName()} in, Connection connection) {
-        return ${f.getByInName()}(List.of(in), connection);
-    }
+    void deleteAll();
 
-    public List<${recordName}> ${f.getByInName()}(List<${f.type.getCanonicalName()}> in, Connection connection) {
-        StringBuilder query = new StringBuilder();
-        query.append("SELECT ${columnsInline} ");
-        query.append("FROM ${tableName} ");
-        query.append("WHERE ${f.columnName} IN (");
+    void deleteAll(Connection connection);
 
-        for (int i = 0; i < in.size(); i++) {
-            query.append("?");
+    void update(${primaryKeyFieldParametersInline}, ${recordName} record);
 
-            if (i < in.size() - 1) {
-                query.append(", ");
-            }
-        }
-
-        query.append(")");
-
-        try (PreparedStatement statement = connection.prepareStatement(query.toString())) {
-            List<${recordName}> result = null;
-
-            for (int i = 0; i < in.size(); i++) {
-                statement.setObject(i + 1, in.get(i));
-            }
-
-            ResultSet resultSet = statement.executeQuery();
-
-            while (resultSet.next()) {
-                if (result == null) {
-                    result = new ArrayList<>();
-                }
-
-                result.add(new ${recordName} (
-                <#list recordFields as field>
-                    ${generateCreateJavaType(field)}<#if field?has_next>,</#if>
-                </#list>
-                ));
-            }
-
-            return result != null ? result : Collections.emptyList();
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-</#list>
-    public List<${recordName}> getAll(Connection connection) {
-        StringBuilder query = new StringBuilder();
-
-        query.append("SELECT ${columnsInline} ");
-        query.append("FROM ${tableName}");
-
-        return executeQuery(query.toString(), connection);
-    }
-
-    private List<${recordName}> executeQuery(String query, Connection connection) {
-        List<${recordName}> result = new ArrayList<>();
-
-        try (PreparedStatement statement = connection.prepareStatement(query)) {
-            ResultSet resultSet = statement.executeQuery();
-
-            while (resultSet.next()) {
-                result.add(new ${recordName} (
-                <#list recordFields as field>
-                    ${generateCreateJavaType(field)}<#if field?has_next>,</#if>
-                </#list>
-                ));
-            }
-
-            return result;
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    private ${recordName} mapResultSet(ResultSet resultSet) {
-        try {
-            return new ${recordName} (
-            <#list recordFields as field>
-                ${generateCreateJavaType(field)}<#if field?has_next>,</#if>
-            </#list>
-            );
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    // INSERT ----------------------------------------------------------------------------------------------------------
-    public void insert(${recordName} record, Connection connection) {
-        StringBuilder query = new StringBuilder();
-        query.append("INSERT INTO ${tableName} (${columnsInline}) VALUES (${columnsQuestionMarkJoined})");
-
-        try (PreparedStatement statement = connection.prepareStatement(query.toString())) {
-            <#list recordFields as f>
-            statement.setObject(${f?index + 1}, record.${f.name}());
-            </#list>
-
-            statement.execute();
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    // DELETE ----------------------------------------------------------------------------------------------------------
-    public void delete(${primaryKeyFieldParametersInline}, Connection connection) {
-        StringBuilder query = new StringBuilder();
-        query.append("DELETE FROM ${tableName}");
-        query.append("WHERE <#list primaryKeyFields as f>${f.columnName} = ?<#if f?has_next> AND </#if></#list>");
-
-        try (PreparedStatement statement = connection.prepareStatement(query.toString())) {
-        <#list primaryKeyFields as f>
-            statement.setObject(${f?index + 1}, ${f.name});
-        </#list>
-            statement.execute();
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    public void deleteAll(Connection connection) {
-        StringBuilder query = new StringBuilder();
-        query.append("DELETE FROM ${tableName}");
-
-        try (PreparedStatement statement = connection.prepareStatement(query.toString())) {
-            statement.execute();
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    // UPDATE ----------------------------------------------------------------------------------------------------------
-    public void update(${recordName} record, Connection connection) {
-        StringBuilder query = new StringBuilder();
-        query.append("UPDATE ${tableName} SET ");
-    <#list recordFields as f>
-        query.append("${f.name} = ?<#if f?has_next>,</#if> ");
-    </#list>
-        query.append("WHERE <#list primaryKeyFields as f>${f.columnName} = ?<#if f?has_next> AND </#if></#list>");
-
-        try (PreparedStatement statement = connection.prepareStatement(query.toString())) {
-        <#list recordFields as f>
-            statement.setObject(${f?index + 1}, record.${f.name}());
-        </#list>
-        <#list primaryKeyFields as f>
-            statement.setObject(${f?index + recordFieldsSize + 1}, record.${f.name}());
-        </#list>
-            statement.execute();
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
-    }
+    void update(${primaryKeyFieldParametersInline}, ${recordName} record, Connection connection);
 }

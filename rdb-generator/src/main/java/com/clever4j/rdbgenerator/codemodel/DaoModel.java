@@ -4,9 +4,9 @@ import com.clever4j.lang.AllNonnullByDefault;
 
 @AllNonnullByDefault
 public record DaoModel(
-    String id,
     String name,
     String packageName,
+    String simpleName,
     RecordModel record
 ) {
 }

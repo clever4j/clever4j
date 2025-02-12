@@ -29,28 +29,12 @@ public final class TemplateProcessor {
         configuration.setSQLDateAndTimeTimeZone(TimeZone.getDefault());
     }
 
-    public Template getTemplate(String name) {
-        try {
-            return configuration.getTemplate(name);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
     public void processRecordTemplate(Map<String, Object> model, String distinction) {
         process(model, "record.ftlh", distinction);
     }
 
-    public void processWhere(Map<String, Object> model, String distinction) {
-        process(model, "where.ftlh", distinction);
-    }
-
-    public void processWhereOperator(Map<String, Object> model, String distinction) {
-        process(model, "where-operator.ftlh", distinction);
-    }
-
     public void processDaoTemplate(Map<String, Object> model, String distinction) {
-        process(model, "dao-v2.ftlh", distinction);
+        process(model, "dao.ftlh", distinction);
     }
 
     public void process(Map<String, Object> model, String template, String distinction) {

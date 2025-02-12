@@ -1,4 +1,4 @@
-package com.clever4j.rdbgenerator.repositorycodegenerator;
+package com.clever4j.rdbgenerator.codegenerator;
 
 import com.clever4j.lang.AllNonnullByDefault;
 import com.clever4j.rdbgenerator.codemodel.DaoModel;
@@ -8,6 +8,7 @@ import freemarker.ext.beans.GenericObjectModel;
 import freemarker.template.TemplateMethodModelEx;
 import freemarker.template.TemplateModelException;
 
+import java.nio.file.Path;
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
@@ -19,20 +20,24 @@ import java.util.stream.Collectors;
 public class DaoGenerator {
 
     private final DaoModel daoModel;
+    private final Path output;
     private final TemplateProcessor templateProcessor;
 
     public DaoGenerator(
         DaoModel daoModel,
+        Path output,
         TemplateProcessor templateProcessor
     ) {
         this.daoModel = daoModel;
+        this.output = output;
         this.templateProcessor = templateProcessor;
     }
 
-    public void generate(String distinctionDirectory) {
+    public void generate() {
         Map<String, Object> model = new HashMap<>();
 
         model.put("packageName", daoModel.packageName());
+        model.put("simpleName", daoModel.simpleName());
         model.put("name", daoModel.name());
         model.put("tableName", daoModel.record().table().name());
         model.put("recordName", daoModel.record().name());
@@ -74,7 +79,7 @@ public class DaoGenerator {
         model.put("generateCreateJavaType", new GenerateCreateJavaType());
         model.put("setStatementObject", new SetStatementObject());
 
-        templateProcessor.processDaoTemplate(model, "%s/%s.java".formatted(distinctionDirectory, daoModel.name()));
+        templateProcessor.processDaoTemplate(model, "%s/%s.java".formatted(output, daoModel.simpleName()));
     }
 
     private static class GenerateCreateJavaType implements TemplateMethodModelEx {

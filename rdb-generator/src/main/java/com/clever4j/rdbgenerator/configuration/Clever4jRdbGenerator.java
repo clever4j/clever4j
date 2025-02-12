@@ -29,10 +29,10 @@ public record Clever4jRdbGenerator(
         RecordGenerator recordGenerator,
 
         @JsonProperty("dao-generator")
-        Object daoGenerator,
+        DaoGenerator daoGenerator,
 
         @JsonProperty("implementation-dao-generator")
-        Object implementationDaoGenerator
+        ImplementationDaoGenerator implementationDaoGenerator
     ) {
         public record RecordGenerator(
             @JsonProperty("package-name")
@@ -62,6 +62,15 @@ public record Clever4jRdbGenerator(
         }
 
         public record DaoGenerator(
+            @JsonProperty("package-name")
+            String packageName,
+
+            @JsonProperty("output")
+            String output
+        ) {
+        }
+
+        public record ImplementationDaoGenerator(
             @JsonProperty("package-name")
             String packageName,
 

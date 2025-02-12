@@ -69,6 +69,58 @@ public class Configuration {
                 recordGeneratorOutput = file.getParent().resolve(recordGeneratorOutput);
             }
 
+            // implementationDaoGenerator
+            Clever4jRdbGenerator.Repository.DaoGenerator configDaoGenerator = repository.daoGenerator();
+
+            DaoGenerator daoGenerator = null;
+
+            if (configDaoGenerator != null) {
+                if (configDaoGenerator.packageName() == null || configDaoGenerator.packageName().isEmpty()) {
+                    throw new IllegalArgumentException("repository.%s.implementationDaoGenerator.packageName is required".formatted(repository.id()));
+                }
+
+                if (configDaoGenerator.output() == null || configDaoGenerator.output().isEmpty()) {
+                    throw new IllegalArgumentException("repository.%s.implementationDaoGenerator.output is required".formatted(repository.id()));
+                }
+
+                Path daoGeneratorOutput = Path.of(configDaoGenerator.output());
+
+                if (!daoGeneratorOutput.isAbsolute()) {
+                    daoGeneratorOutput = file.getParent().resolve(daoGeneratorOutput);
+                }
+
+                daoGenerator = new DaoGenerator(
+                    configDaoGenerator.packageName(),
+                    daoGeneratorOutput
+                );
+            }
+
+            // implementationDaoGenerator
+            Clever4jRdbGenerator.Repository.ImplementationDaoGenerator configImplementationDaoGenerator = repository.implementationDaoGenerator();
+
+            ImplementationDaoGenerator implementationDaoGenerator = null;
+
+            if (configImplementationDaoGenerator != null) {
+                if (configImplementationDaoGenerator.packageName() == null || configImplementationDaoGenerator.packageName().isEmpty()) {
+                    throw new IllegalArgumentException("repository.%s.implementationDaoGenerator.packageName is required".formatted(repository.id()));
+                }
+
+                if (configImplementationDaoGenerator.output() == null || configImplementationDaoGenerator.output().isEmpty()) {
+                    throw new IllegalArgumentException("repository.%s.implementationDaoGenerator.output is required".formatted(repository.id()));
+                }
+
+                Path implementationDaoGeneratorOutput = Path.of(configImplementationDaoGenerator.output());
+
+                if (!implementationDaoGeneratorOutput.isAbsolute()) {
+                    implementationDaoGeneratorOutput = file.getParent().resolve(implementationDaoGeneratorOutput);
+                }
+
+                implementationDaoGenerator = new ImplementationDaoGenerator(
+                    configImplementationDaoGenerator.packageName(),
+                    implementationDaoGeneratorOutput
+                );
+            }
+
             repositories.add(new Repository(
                 repository.id(),
                 repository.dbUrl(),
@@ -77,8 +129,12 @@ public class Configuration {
                 new RecordGenerator(
                     recordGenerator.packageName(),
                     recordGeneratorOutput
-                )
+                ),
+                daoGenerator,
+                implementationDaoGenerator
             ));
+
+            System.out.println("test");
         }
     }
 
