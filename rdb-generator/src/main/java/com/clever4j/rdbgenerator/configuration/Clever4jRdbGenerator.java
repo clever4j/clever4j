@@ -25,58 +25,23 @@ public record Clever4jRdbGenerator(
         @JsonProperty("db-password")
         String dbPassword,
 
-        @JsonProperty("record-generator")
-        RecordGenerator recordGenerator,
+        @JsonProperty("record-package-name")
+        String recordPackageName,
 
-        @JsonProperty("dao-generator")
-        DaoGenerator daoGenerator,
+        @JsonProperty("record-output")
+        String recordOutput,
 
-        @JsonProperty("implementation-dao-generator")
-        ImplementationDaoGenerator implementationDaoGenerator
+        @JsonProperty("dao-package-name")
+        String daoPackageName,
+
+        @JsonProperty("dao-output")
+        String daoOutput,
+
+        @JsonProperty("implementation-dao-package-name")
+        String implementationDaoPackageName,
+
+        @JsonProperty("implementation-dao-output")
+        String implementationDaoOutput
     ) {
-        public record RecordGenerator(
-            @JsonProperty("package-name")
-            String packageName,
-
-            @JsonProperty("output")
-            String output,
-
-            @JsonProperty("exclude-regex")
-            String excludeRegex,
-
-            @JsonProperty("records")
-            List<Record> records
-        ) {
-
-            public record Record(
-                String id,
-                List<Field> fields
-            ) {
-                public record Field(
-                    String id,
-                    String type
-                ) {
-
-                }
-            }
-        }
-
-        public record DaoGenerator(
-            @JsonProperty("package-name")
-            String packageName,
-
-            @JsonProperty("output")
-            String output
-        ) {
-        }
-
-        public record ImplementationDaoGenerator(
-            @JsonProperty("package-name")
-            String packageName,
-
-            @JsonProperty("output")
-            String output
-        ) {
-        }
     }
 }

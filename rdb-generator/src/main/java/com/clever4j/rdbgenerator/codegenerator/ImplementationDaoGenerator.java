@@ -2,12 +2,15 @@ package com.clever4j.rdbgenerator.codegenerator;
 
 import com.clever4j.lang.AllNonnullByDefault;
 import com.clever4j.rdbgenerator.codemodel.DaoModel;
+import com.clever4j.rdbgenerator.codemodel.ImplementationDaoModel;
 import com.clever4j.rdbgenerator.codemodel.RecordFieldModel;
+import com.clever4j.rdbgenerator.codemodel.RecordModel;
 import com.clever4j.rdbgenerator.freemarker.TemplateProcessor;
 import freemarker.ext.beans.GenericObjectModel;
 import freemarker.template.TemplateMethodModelEx;
 import freemarker.template.TemplateModelException;
 
+import java.nio.file.Path;
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
@@ -18,63 +21,68 @@ import java.util.stream.Collectors;
 @AllNonnullByDefault
 public class ImplementationDaoGenerator {
 
-    private final DaoModel daoModel;
+    private final ImplementationDaoModel implementationDaoModel;
+    private final Path output;
     private final TemplateProcessor templateProcessor;
 
-    public ImplementationDaoGenerator(
-        DaoModel daoModel,
-        TemplateProcessor templateProcessor
-    ) {
-        this.daoModel = daoModel;
+    public ImplementationDaoGenerator(ImplementationDaoModel implementationDaoModel, Path output, TemplateProcessor templateProcessor) {
+        this.implementationDaoModel = implementationDaoModel;
+        this.output = output;
         this.templateProcessor = templateProcessor;
     }
 
-    public void generate(String distinctionDirectory) {
+    public void generate() {
         Map<String, Object> model = new HashMap<>();
 
-        model.put("packageName", daoModel.packageName());
-        model.put("name", daoModel.name());
-        model.put("tableName", daoModel.record().table().name());
-        model.put("recordName", daoModel.record().name());
-        model.put("recordFields", daoModel.record().fields());
+        model.put("name", implementationDaoModel.name());
+        model.put("packageName", implementationDaoModel.packageName());
+        model.put("simpleName", implementationDaoModel.simpleName());
+        model.put("daoModel", implementationDaoModel.daoModel());
+        model.put("record", implementationDaoModel.record());
 
-        model.put("recordFieldsSize", daoModel.record().fields().size());
+        // model.put("packageName", implementationDaoModel.packageName());
+        // model.put("name", implementationDaoModel.name());
+        // model.put("tableName", implementationDaoModel.record().table().name());
+        // model.put("recordName", implementationDaoModel.record().name());
+        // model.put("recordFields", implementationDaoModel.record().fields());
 
-        List<RecordFieldModel> primaryKeyFields = daoModel.record().fields().stream()
-            .filter(RecordFieldModel::primaryKey)
-            .toList();
+        // model.put("recordFieldsSize", implementationDaoModel.record().fields().size());
 
-        model.put("primaryKeyFields", primaryKeyFields);
+        // List<RecordFieldModel> primaryKeyFields = implementationDaoModel.record().fields().stream()
+        //     .filter(RecordFieldModel::primaryKey)
+        //     .toList();
 
-        String primaryKeyFieldParametersInline = daoModel.record().fields().stream()
-            .filter(RecordFieldModel::primaryKey)
-            .map(recordField -> {
-                return "%s %s".formatted(recordField.type().getCanonicalName(), recordField.name());
-            }).collect(Collectors.joining(", "));
+        // model.put("primaryKeyFields", primaryKeyFields);
 
-        model.put("primaryKeyFieldParametersInline", primaryKeyFieldParametersInline);
+        // String primaryKeyFieldParametersInline = implementationDaoModel.record().fields().stream()
+        //     .filter(RecordFieldModel::primaryKey)
+        //     .map(recordField -> {
+        //         return "%s %s".formatted(recordField.type().getCanonicalName(), recordField.name());
+        //     }).collect(Collectors.joining(", "));
 
-        // columnsInline
-        String columnsInline = daoModel.record().fields().stream()
-            .map(recordField -> {
-                return "\\\"%s\\\"".formatted(recordField.columnName());
-            }).collect(Collectors.joining(", "));
+        // model.put("primaryKeyFieldParametersInline", primaryKeyFieldParametersInline);
 
-        model.put("columnsInline", columnsInline);
+        // // columnsInline
+        // String columnsInline = implementationDaoModel.record().fields().stream()
+        //     .map(recordField -> {
+        //         return "\\\"%s\\\"".formatted(recordField.columnName());
+        //     }).collect(Collectors.joining(", "));
 
-        // columnsQuestionMarkJoined
-        String columnsQuestionMarkJoined = daoModel.record().fields().stream()
-            .map(recordField -> {
-                return "?";
-            }).collect(Collectors.joining(", "));
+        // model.put("columnsInline", columnsInline);
 
-        model.put("columnsQuestionMarkJoined", columnsQuestionMarkJoined);
+        // // columnsQuestionMarkJoined
+        // String columnsQuestionMarkJoined = implementationDaoModel.record().fields().stream()
+        //     .map(recordField -> {
+        //         return "?";
+        //     }).collect(Collectors.joining(", "));
 
-        // functions
-        model.put("generateCreateJavaType", new GenerateCreateJavaType());
-        model.put("setStatementObject", new SetStatementObject());
+        // model.put("columnsQuestionMarkJoined", columnsQuestionMarkJoined);
 
-        templateProcessor.processDaoTemplate(model, "%s/%s.java".formatted(distinctionDirectory, daoModel.name()));
+        // // functions
+        // model.put("generateCreateJavaType", new GenerateCreateJavaType());
+        // model.put("setStatementObject", new SetStatementObject());
+
+        templateProcessor.processImplementationDaoTemplate(model, "%s/%s.java".formatted(output, implementationDaoModel.simpleName()));
     }
 
     private static class GenerateCreateJavaType implements TemplateMethodModelEx {

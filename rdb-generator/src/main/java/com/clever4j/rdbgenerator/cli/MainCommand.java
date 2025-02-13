@@ -48,18 +48,11 @@ public final class MainCommand implements Callable<Integer> {
             MetadataLoader metadataLoader = new MetadataLoader(connection);
             DatabaseMetadata databaseMetadata = metadataLoader.load();
 
-            // for (TableMetadata table : databaseMetadata.tables()) {
-            //     if (!table.name().equals("test_tag")) {
-            //         continue;
-            //     }
-            // }
+            CodeModelLoader codeModelLoader = new CodeModelLoader(repository, databaseMetadata);
+            CodeModel codeModel = codeModelLoader.load();
 
-            try (CodeModelLoader codeModelLoader = new CodeModelLoader(repository, databaseMetadata)) {
-                CodeModel codeModel = codeModelLoader.load();
-
-                RepositoryCodeGenerator repositoryCodeGenerator = new RepositoryCodeGenerator(repository, codeModel, templateProcessor);
-                repositoryCodeGenerator.run();
-            }
+            RepositoryCodeGenerator repositoryCodeGenerator = new RepositoryCodeGenerator(repository, codeModel, templateProcessor);
+            repositoryCodeGenerator.run();
         }
 
         return 0;

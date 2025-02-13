@@ -9,33 +9,36 @@ import com.clever4j.rdbgenerator.configuration.Repository;
 import jakarta.annotation.Nullable;
 
 import java.io.Closeable;
-import java.sql.*;
+import java.sql.Connection;
+import java.sql.DatabaseMetaData;
+import java.sql.DriverManager;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import static java.util.Collections.unmodifiableList;
+
 @AllNonnullByDefault
-public final class CodeModelLoader implements Closeable {
+public final class CodeModelLoader {
 
     private final Repository repository;
     private final DatabaseMetadata databaseMetadata;
-
-    @Nullable
-    private Connection connection;
 
     public CodeModelLoader(Repository repository, DatabaseMetadata databaseMetadata) {
         this.repository = repository;
         this.databaseMetadata = databaseMetadata;
     }
 
-    public CodeModel load() throws SQLException {
-        Connection connection = getConnection();
-        DatabaseMetaData metadata = connection.getMetaData();
+    public CodeModel load() {
         TypeMapper typeMapper = new TypeMapper();
         ObjectNameProvider objectNameProvider = new ObjectNameProvider();
-        List<RecordModel> records = new ArrayList<>();
-        List<DaoModel> daos = new ArrayList<>();
+        List<RecordModel> recordModels = new ArrayList<>();
+        List<DaoModel> daoModels = new ArrayList<>();
+        List<ImplementationDaoModel> implementationDaoModels = new ArrayList<>();
 
         for (TableMetadata table : databaseMetadata.tables()) {
             if (!table.name().equals("test_tag")) {
@@ -46,11 +49,11 @@ public final class CodeModelLoader implements Closeable {
                 continue;
             }
 
-            // fields --------------------------------------------------------------------------------------------------
-            List<RecordFieldModel> fields = new ArrayList<>();
+            // fieldModels --------------------------------------------------------------------------------------------------
+            List<RecordFieldModel> fieldModels = new ArrayList<>();
 
             for (ColumnMetadata column : table.columns()) {
-                fields.add(new RecordFieldModel(
+                fieldModels.add(new RecordFieldModel(
                     typeMapper.map(column.type()),
                     objectNameProvider.getFieldName(column.name()),
                     objectNameProvider.getByInName(column.name()),
@@ -61,38 +64,44 @@ public final class CodeModelLoader implements Closeable {
                 ));
             }
 
-            // record --------------------------------------------------------------------------------------------------
-            String recordPackageName = repository.recordGenerator().packageName();
+            // recordModel --------------------------------------------------------------------------------------------------
+            String recordPackageName = repository.recordPackageName();
             String recordSimpleName = objectNameProvider.getRecordName(table.name());
             String recordName = recordPackageName + "." + recordSimpleName;
 
-            RecordModel record = new RecordModel(
+            RecordModel recordModel = new RecordModel(
                 recordName,
                 recordSimpleName,
                 recordPackageName,
                 table,
-                fields
+                fieldModels
             );
 
-            records.add(record);
+            recordModels.add(recordModel);
 
-            if (repository.daoGenerator() != null) {
-                DaoGenerator daoGenerator = repository.daoGenerator();
+            DaoModel daoModel = new DaoModel(
+                repository.daoPackageName() + "." + objectNameProvider.getDaoSimpleName(recordModel),
+                repository.daoPackageName(),
+                objectNameProvider.getDaoSimpleName(recordModel),
+                recordModel
+            );
 
-                String name = daoGenerator.packageName() + "." + objectNameProvider.getDaoSimpleName(record);
-                String packageName = daoGenerator.packageName();
-                String simpleName = objectNameProvider.getDaoSimpleName(record);
+            daoModels.add(daoModel);
 
-                daos.add(new DaoModel(
-                    name,
-                    packageName,
-                    simpleName,
-                    record
-                ));
-            }
+            implementationDaoModels.add(new ImplementationDaoModel(
+                repository.implementationDaoPackageName() + "." + objectNameProvider.getImplementationDaoSimpleName(daoModel),
+                repository.implementationDaoPackageName(),
+                objectNameProvider.getImplementationDaoSimpleName(daoModel),
+                daoModel,
+                recordModel
+            ));
         }
 
-        return new CodeModel(records, daos);
+        return new CodeModel(
+            unmodifiableList(recordModels),
+            unmodifiableList(daoModels),
+            unmodifiableList(implementationDaoModels)
+        );
     }
 
     private boolean isTableExcluded(String tableName) {
@@ -115,30 +124,5 @@ public final class CodeModelLoader implements Closeable {
         }
 
         return primaryKeys;
-    }
-
-    private Connection getConnection() throws SQLException {
-        if (connection == null) {
-            connection = DriverManager.getConnection(
-                repository.dbUrl(),
-                repository.dbUser(),
-                repository.dbPassword()
-            );
-        }
-
-        return connection;
-    }
-
-    @Override
-    public void close() {
-        if (connection == null) {
-            return;
-        }
-
-        try {
-            connection.close();
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
     }
 }

@@ -37,6 +37,10 @@ public final class TemplateProcessor {
         process(model, "dao.ftlh", distinction);
     }
 
+    public void processImplementationDaoTemplate(Map<String, Object> model, String distinction) {
+        process(model, "implementation-dao.ftlh", distinction);
+    }
+
     public void process(Map<String, Object> model, String template, String distinction) {
         try {
             Template template1 = configuration.getTemplate(template);

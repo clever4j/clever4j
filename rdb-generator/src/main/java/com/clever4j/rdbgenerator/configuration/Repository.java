@@ -1,7 +1,8 @@
 package com.clever4j.rdbgenerator.configuration;
 
 import com.clever4j.lang.AllNonnullByDefault;
-import jakarta.annotation.Nullable;
+
+import java.nio.file.Path;
 
 @AllNonnullByDefault
 public record Repository(
@@ -9,13 +10,15 @@ public record Repository(
     String dbUrl,
     String dbUser,
     String dbPassword,
-    RecordGenerator recordGenerator,
 
-    @Nullable
-    DaoGenerator daoGenerator,
+    String recordPackageName,
+    Path recordOutput,
 
-    @Nullable
-    ImplementationDaoGenerator implementationDaoGenerator
+    String daoPackageName,
+    Path daoOutput,
+
+    String implementationDaoPackageName,
+    Path implementationDaoOutput
 ) {
 
 }

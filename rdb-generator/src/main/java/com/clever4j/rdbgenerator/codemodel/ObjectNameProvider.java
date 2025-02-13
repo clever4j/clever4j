@@ -27,4 +27,8 @@ public final class ObjectNameProvider {
     public String getWhereName(RecordModel record) {
         return NAMING_STYLE_CONVERTER.convert(record.table().name(), NamingStyleConverter.NamingStyle.PASCAL_CASE) + "Where";
     }
+
+    public String getImplementationDaoSimpleName(DaoModel daoModel) {
+        return daoModel.simpleName() + "Impl";
+    }
 }

@@ -6,7 +6,8 @@ import java.util.List;
 
 @AllNonnullByDefault
 public record CodeModel(
-    List<RecordModel> records,
-    List<DaoModel> daos
+    List<RecordModel> recordModels,
+    List<DaoModel> daoModels,
+    List<ImplementationDaoModel> implementationDaoModels
 ) {
 }
