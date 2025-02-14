@@ -1,10 +1,11 @@
 package com.clever4j.rdb.connection;
 
 import java.sql.Connection;
+import java.sql.SQLException;
 
 public interface ConnectionProvider {
 
-    Connection getConnection();
+    Connection getConnection(String databaseId);
 
-    Connection getNewConnection();
+    Connection getNewConnection(String databaseId);
 }

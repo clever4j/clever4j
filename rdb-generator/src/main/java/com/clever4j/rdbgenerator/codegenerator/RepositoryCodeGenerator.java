@@ -5,28 +5,29 @@ import com.clever4j.rdbgenerator.codemodel.CodeModel;
 import com.clever4j.rdbgenerator.codemodel.DaoModel;
 import com.clever4j.rdbgenerator.codemodel.ImplementationDaoModel;
 import com.clever4j.rdbgenerator.codemodel.RecordModel;
-import com.clever4j.rdbgenerator.configuration.Repository;
+import com.clever4j.rdbgenerator.configuration.Database;
 import com.clever4j.rdbgenerator.freemarker.TemplateProcessor;
 
 @AllNonnullByDefault
 public final class RepositoryCodeGenerator {
 
-    private final Repository repository;
+    private final Database database;
     private final CodeModel codeModel;
     private final TemplateProcessor templateProcessor;
 
-    public RepositoryCodeGenerator(Repository repository, CodeModel codeModel, TemplateProcessor templateProcessor) {
-        this.repository = repository;
+    public RepositoryCodeGenerator(Database database, CodeModel codeModel, TemplateProcessor templateProcessor) {
+        this.database = database;
         this.codeModel = codeModel;
         this.templateProcessor = templateProcessor;
     }
 
     public void run() {
+
         // recordModels -----------------------------------------------------------------------------------------------------
         for (RecordModel record : codeModel.recordModels()) {
             RecordGenerator recordGenerator = new RecordGenerator(
                 record,
-                repository.recordOutput(),
+                database.recordOutput(),
                 templateProcessor
             );
 
@@ -37,7 +38,7 @@ public final class RepositoryCodeGenerator {
         for (DaoModel dao : codeModel.daoModels()) {
             DaoGenerator daoGenerator = new DaoGenerator(
                 dao,
-                repository.daoOutput(),
+                database.daoOutput(),
                 templateProcessor
             );
 
@@ -48,7 +49,7 @@ public final class RepositoryCodeGenerator {
         for (ImplementationDaoModel implementationDaoModel : codeModel.implementationDaoModels()) {
             ImplementationDaoGenerator implementationDaoGenerator = new ImplementationDaoGenerator(
                 implementationDaoModel,
-                repository.implementationDaoOutput(),
+                database.implementationDaoOutput(),
                 templateProcessor
             );
 

@@ -39,12 +39,7 @@ public class ImplementationDaoGenerator {
         model.put("simpleName", implementationDaoModel.simpleName());
         model.put("daoModel", implementationDaoModel.daoModel());
         model.put("record", implementationDaoModel.record());
-
-        // model.put("packageName", implementationDaoModel.packageName());
-        // model.put("name", implementationDaoModel.name());
-        // model.put("tableName", implementationDaoModel.record().table().name());
-        // model.put("recordName", implementationDaoModel.record().name());
-        // model.put("recordFields", implementationDaoModel.record().fields());
+        model.put("database", implementationDaoModel.database());
 
         // model.put("recordFieldsSize", implementationDaoModel.record().fields().size());
 
@@ -79,8 +74,8 @@ public class ImplementationDaoGenerator {
         // model.put("columnsQuestionMarkJoined", columnsQuestionMarkJoined);
 
         // // functions
-        // model.put("generateCreateJavaType", new GenerateCreateJavaType());
-        // model.put("setStatementObject", new SetStatementObject());
+        model.put("generateCreateJavaType", new GenerateCreateJavaType());
+        model.put("setStatementObject", new SetStatementObject());
 
         templateProcessor.processImplementationDaoTemplate(model, "%s/%s.java".formatted(output, implementationDaoModel.simpleName()));
     }

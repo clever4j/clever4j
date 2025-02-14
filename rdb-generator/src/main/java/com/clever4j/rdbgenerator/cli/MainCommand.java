@@ -5,7 +5,7 @@ import com.clever4j.rdb.metadata.MetadataLoader;
 import com.clever4j.rdbgenerator.codemodel.CodeModel;
 import com.clever4j.rdbgenerator.codemodel.CodeModelLoader;
 import com.clever4j.rdbgenerator.configuration.Configuration;
-import com.clever4j.rdbgenerator.configuration.Repository;
+import com.clever4j.rdbgenerator.configuration.Database;
 import com.clever4j.rdbgenerator.freemarker.TemplateProcessor;
 import com.clever4j.rdbgenerator.codegenerator.RepositoryCodeGenerator;
 import com.clever4j.rdbgenerator.services.Services;
@@ -42,27 +42,27 @@ public final class MainCommand implements Callable<Integer> {
         TemplateProcessor templateProcessor = Services.templateProcessor();
 
         // Executor ----------------------------------------------------------------------------------------------------
-        for (Repository repository : configuration.getRepositories()) {
-            Connection connection = getConnection(repository);
+        for (Database database : configuration.getRepositories()) {
+            Connection connection = getConnection(database);
 
             MetadataLoader metadataLoader = new MetadataLoader(connection);
             DatabaseMetadata databaseMetadata = metadataLoader.load();
 
-            CodeModelLoader codeModelLoader = new CodeModelLoader(repository, databaseMetadata);
+            CodeModelLoader codeModelLoader = new CodeModelLoader(database, databaseMetadata);
             CodeModel codeModel = codeModelLoader.load();
 
-            RepositoryCodeGenerator repositoryCodeGenerator = new RepositoryCodeGenerator(repository, codeModel, templateProcessor);
+            RepositoryCodeGenerator repositoryCodeGenerator = new RepositoryCodeGenerator(database, codeModel, templateProcessor);
             repositoryCodeGenerator.run();
         }
 
         return 0;
     }
 
-    private Connection getConnection(Repository repository) throws SQLException {
+    private Connection getConnection(Database database) throws SQLException {
         return DriverManager.getConnection(
-            repository.dbUrl(),
-            repository.dbUser(),
-            repository.dbPassword()
+            database.dbUrl(),
+            database.dbUser(),
+            database.dbPassword()
         );
     }
 }

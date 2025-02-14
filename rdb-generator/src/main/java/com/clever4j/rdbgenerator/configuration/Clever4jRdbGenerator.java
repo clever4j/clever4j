@@ -11,9 +11,9 @@ public record Clever4jRdbGenerator(
     @JsonProperty("option-b")
     boolean optionB,
 
-    List<Repository> repositories
+    List<Database> databases
 ) {
-    public record Repository(
+    public record Database(
         String id,
 
         @JsonProperty("db-url")

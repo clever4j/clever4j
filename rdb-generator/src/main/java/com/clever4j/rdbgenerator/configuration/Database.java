@@ -5,7 +5,7 @@ import com.clever4j.lang.AllNonnullByDefault;
 import java.nio.file.Path;
 
 @AllNonnullByDefault
-public record Repository(
+public record Database(
     String id,
     String dbUrl,
     String dbUser,

@@ -14,7 +14,7 @@ import java.util.List;
 public class Configuration {
 
     private Path file;
-    private List<Repository> repositories = new ArrayList<>();
+    private List<Database> repositories = new ArrayList<>();
 
     public Configuration(Path file) throws IOException {
         this.file = file;
@@ -27,27 +27,27 @@ public class Configuration {
 
         Clever4jRdbGenerator clever4jRdbGenerator = mapper.readValue(file.toFile(), Clever4jRdbGenerator.class);
 
-        // repositories ------------------------------------------------------------------------------------------------
-        if (clever4jRdbGenerator.repositories() == null || clever4jRdbGenerator.repositories().isEmpty()) {
+        // databases ------------------------------------------------------------------------------------------------
+        if (clever4jRdbGenerator.databases() == null || clever4jRdbGenerator.databases().isEmpty()) {
             throw new RuntimeException("At least one repository is required");
         }
 
-        for (Clever4jRdbGenerator.Repository repository : clever4jRdbGenerator.repositories()) {
-            String id = readString(repository.id(), "repository.id is required");
-            String dbUrl = readString(repository.dbUrl(), "repository.%s.db-url is required".formatted(id));
-            String dbUser = readString(repository.dbUser(), "repository.%s.db-user is required".formatted(id));
-            String dbPassword = readString(repository.dbPassword(), "repository.%s.db-password is required".formatted(id));
+        for (Clever4jRdbGenerator.Database database : clever4jRdbGenerator.databases()) {
+            String id = readString(database.id(), "repository.id is required");
+            String dbUrl = readString(database.dbUrl(), "repository.%s.db-url is required".formatted(id));
+            String dbUser = readString(database.dbUser(), "repository.%s.db-user is required".formatted(id));
+            String dbPassword = readString(database.dbPassword(), "repository.%s.db-password is required".formatted(id));
 
-            String recordPackageName = readString(repository.recordPackageName(), "repository.%s.record-package-name is required".formatted(id));
-            Path recordOutput = readPath(repository.recordOutput(), "repository.%s.record-output is required".formatted(id));
+            String recordPackageName = readString(database.recordPackageName(), "repository.%s.record-package-name is required".formatted(id));
+            Path recordOutput = readPath(database.recordOutput(), "repository.%s.record-output is required".formatted(id));
 
-            String daoPackageName = readString(repository.daoPackageName(), "repository.%s.dao-package-name is required".formatted(id));
-            Path daoOutput = readPath(repository.daoOutput(), "repository.%s.dao-output is required".formatted(id));
+            String daoPackageName = readString(database.daoPackageName(), "repository.%s.dao-package-name is required".formatted(id));
+            Path daoOutput = readPath(database.daoOutput(), "repository.%s.dao-output is required".formatted(id));
 
-            String implementationDaoPackageName = readString(repository.implementationDaoPackageName(), "repository.%s.implementation-dao-package-name is required".formatted(id));
-            Path implementationDaoOutput = readPath(repository.implementationDaoOutput(), "repository.%s.implementation-dao-output is required".formatted(id));
+            String implementationDaoPackageName = readString(database.implementationDaoPackageName(), "repository.%s.implementation-dao-package-name is required".formatted(id));
+            Path implementationDaoOutput = readPath(database.implementationDaoOutput(), "repository.%s.implementation-dao-output is required".formatted(id));
 
-            repositories.add(new Repository(id, dbUrl, dbUser, dbPassword, recordPackageName, recordOutput,
+            repositories.add(new Database(id, dbUrl, dbUser, dbPassword, recordPackageName, recordOutput,
                 daoPackageName, daoOutput, implementationDaoPackageName, implementationDaoOutput));
         }
     }
@@ -104,7 +104,7 @@ public class Configuration {
         return file.getParent().resolve(path);
     }
 
-    public List<Repository> getRepositories() {
+    public List<Database> getRepositories() {
         return repositories;
     }
 }

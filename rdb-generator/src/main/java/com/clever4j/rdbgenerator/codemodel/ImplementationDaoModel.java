@@ -1,6 +1,7 @@
 package com.clever4j.rdbgenerator.codemodel;
 
 import com.clever4j.lang.AllNonnullByDefault;
+import com.clever4j.rdbgenerator.configuration.Database;
 
 @AllNonnullByDefault
 public record ImplementationDaoModel(
@@ -8,6 +9,7 @@ public record ImplementationDaoModel(
     String packageName,
     String simpleName,
     DaoModel daoModel,
-    RecordModel record
+    RecordModel record,
+    Database database
 ) {
 }

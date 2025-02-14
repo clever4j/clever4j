@@ -4,18 +4,12 @@ import com.clever4j.lang.AllNonnullByDefault;
 import com.clever4j.rdb.metadata.ColumnMetadata;
 import com.clever4j.rdb.metadata.DatabaseMetadata;
 import com.clever4j.rdb.metadata.TableMetadata;
-import com.clever4j.rdbgenerator.configuration.DaoGenerator;
-import com.clever4j.rdbgenerator.configuration.Repository;
-import jakarta.annotation.Nullable;
+import com.clever4j.rdbgenerator.configuration.Database;
 
-import java.io.Closeable;
-import java.sql.Connection;
 import java.sql.DatabaseMetaData;
-import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -25,11 +19,11 @@ import static java.util.Collections.unmodifiableList;
 @AllNonnullByDefault
 public final class CodeModelLoader {
 
-    private final Repository repository;
+    private final Database database;
     private final DatabaseMetadata databaseMetadata;
 
-    public CodeModelLoader(Repository repository, DatabaseMetadata databaseMetadata) {
-        this.repository = repository;
+    public CodeModelLoader(Database database, DatabaseMetadata databaseMetadata) {
+        this.database = database;
         this.databaseMetadata = databaseMetadata;
     }
 
@@ -65,7 +59,7 @@ public final class CodeModelLoader {
             }
 
             // recordModel --------------------------------------------------------------------------------------------------
-            String recordPackageName = repository.recordPackageName();
+            String recordPackageName = database.recordPackageName();
             String recordSimpleName = objectNameProvider.getRecordName(table.name());
             String recordName = recordPackageName + "." + recordSimpleName;
 
@@ -74,26 +68,30 @@ public final class CodeModelLoader {
                 recordSimpleName,
                 recordPackageName,
                 table,
-                fieldModels
+                fieldModels,
+                fieldModels.stream().filter(RecordFieldModel::primaryKey).toList(),
+                database
             );
 
             recordModels.add(recordModel);
 
             DaoModel daoModel = new DaoModel(
-                repository.daoPackageName() + "." + objectNameProvider.getDaoSimpleName(recordModel),
-                repository.daoPackageName(),
+                database.daoPackageName() + "." + objectNameProvider.getDaoSimpleName(recordModel),
+                database.daoPackageName(),
                 objectNameProvider.getDaoSimpleName(recordModel),
-                recordModel
+                recordModel,
+                database
             );
 
             daoModels.add(daoModel);
 
             implementationDaoModels.add(new ImplementationDaoModel(
-                repository.implementationDaoPackageName() + "." + objectNameProvider.getImplementationDaoSimpleName(daoModel),
-                repository.implementationDaoPackageName(),
+                database.implementationDaoPackageName() + "." + objectNameProvider.getImplementationDaoSimpleName(daoModel),
+                database.implementationDaoPackageName(),
                 objectNameProvider.getImplementationDaoSimpleName(daoModel),
                 daoModel,
-                recordModel
+                recordModel,
+                database
             ));
         }
 
