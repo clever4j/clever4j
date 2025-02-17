@@ -8,6 +8,7 @@ import jakarta.annotation.Nullable;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 @AllNonnullByDefault
@@ -34,21 +35,33 @@ public class Configuration {
 
         for (Clever4jRdbGenerator.Database database : clever4jRdbGenerator.databases()) {
             String id = readString(database.id(), "repository.id is required");
-            String dbUrl = readString(database.dbUrl(), "repository.%s.db-url is required".formatted(id));
-            String dbUser = readString(database.dbUser(), "repository.%s.db-user is required".formatted(id));
-            String dbPassword = readString(database.dbPassword(), "repository.%s.db-password is required".formatted(id));
 
-            String recordPackageName = readString(database.recordPackageName(), "repository.%s.record-package-name is required".formatted(id));
-            Path recordOutput = readPath(database.recordOutput(), "repository.%s.record-output is required".formatted(id));
+            repositories.add(new Database(
+                id,
+                readString(database.dbUrl(), "repository.%s.db-url is required".formatted(id)),
+                readString(database.dbUser(), "repository.%s.db-user is required".formatted(id)),
+                readString(database.dbPassword(), "repository.%s.db-password is required".formatted(id)),
+                readStringList(database.excludeTables(), false, ""),
 
-            String daoPackageName = readString(database.daoPackageName(), "repository.%s.dao-package-name is required".formatted(id));
-            Path daoOutput = readPath(database.daoOutput(), "repository.%s.dao-output is required".formatted(id));
+                readString(database.recordPackageName(), "repository.%s.recordModel-package-name is required".formatted(id)),
+                readPath(database.recordOutput(), "repository.%s.recordModel-output is required".formatted(id)),
+                readStringList(database.recordAnnotations(), false, ""),
 
-            String implementationDaoPackageName = readString(database.implementationDaoPackageName(), "repository.%s.implementation-dao-package-name is required".formatted(id));
-            Path implementationDaoOutput = readPath(database.implementationDaoOutput(), "repository.%s.implementation-dao-output is required".formatted(id));
+                readString(database.baseDaoPackageName(), "repository.%s.base-dao-package-name is required".formatted(id)),
+                readPath(database.baseDaoOutput(), "repository.%s.base-dao-package-name is required".formatted(id)),
 
-            repositories.add(new Database(id, dbUrl, dbUser, dbPassword, recordPackageName, recordOutput,
-                daoPackageName, daoOutput, implementationDaoPackageName, implementationDaoOutput));
+                readString(database.daoPackageName(), "repository.%s.dao-package-name is required".formatted(id)),
+                readPath(database.daoOutput(), "repository.%s.dao-output is required".formatted(id)),
+                readStringList(database.daoAnnotations(), false, ""),
+
+                readString(database.baseImplementationDaoPackageName(), "repository.%s.base-implementation-dao-package-name is required".formatted(id)),
+                readPath(database.baseImplementationDaoOutput(), "repository.%s.base-implementation-dao-output is required".formatted(id)),
+                readStringList(database.baseImplementationDaoAnnotations(), false, ""),
+
+                readString(database.implementationDaoPackageName(), "repository.%s.implementation-dao-package-name is required".formatted(id)),
+                readPath(database.implementationDaoOutput(), "repository.%s.implementation-dao-output is required".formatted(id)),
+                readStringList(database.implementationDaoAnnotations(), false, "")
+            ));
         }
     }
 
@@ -102,6 +115,14 @@ public class Configuration {
         }
 
         return file.getParent().resolve(path);
+    }
+
+    private List<String> readStringList(@Nullable List<String> value, boolean require, String errorMessage) {
+        if (require && (value == null || value.isEmpty())) {
+            throw new RuntimeException(errorMessage);
+        }
+
+        return value == null ? List.of() : Collections.unmodifiableList(value);
     }
 
     public List<Database> getRepositories() {

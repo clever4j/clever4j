@@ -1,5 +1,6 @@
 package com.clever4j.rdbgenerator.freemarker;
 
+import com.clever4j.fs.FsUtil;
 import com.clever4j.lang.AllNonnullByDefault;
 import freemarker.template.Configuration;
 import freemarker.template.Template;
@@ -8,6 +9,7 @@ import freemarker.template.TemplateExceptionHandler;
 
 import java.io.FileWriter;
 import java.io.IOException;
+import java.nio.file.Path;
 import java.util.Map;
 import java.util.TimeZone;
 
@@ -29,23 +31,41 @@ public final class TemplateProcessor {
         configuration.setSQLDateAndTimeTimeZone(TimeZone.getDefault());
     }
 
-    public void processRecordTemplate(Map<String, Object> model, String distinction) {
-        process(model, "record.ftlh", distinction);
+    public void processRecordTemplate(Map<String, Object> model, String target) {
+        process(model, "record.ftlh", target);
     }
 
-    public void processDaoTemplate(Map<String, Object> model, String distinction) {
-        process(model, "dao.ftlh", distinction);
+    public void processBaseDaoTemplate(Map<String, Object> model, String target) {
+        process(model, "base-dao.ftlh", target);
     }
 
-    public void processImplementationDaoTemplate(Map<String, Object> model, String distinction) {
-        process(model, "implementation-dao.ftlh", distinction);
+    public void processDaoTemplate(Map<String, Object> model, String target) {
+        process(model, "dao.ftlh", target);
     }
 
-    public void process(Map<String, Object> model, String template, String distinction) {
+    public void processBaseImplementationDaoTemplate(Map<String, Object> model, String target) {
+        process(model, "base-implementation-dao.ftlh", target);
+    }
+
+    public void processImplementationDaoTemplate(Map<String, Object> model, String target) {
+        process(model, "implementation-dao.ftlh", target);
+    }
+
+    public void process(Map<String, Object> model, String template, String target) {
         try {
+            Path targetPath = Path.of(target);
+
+            Path parent = targetPath.getParent();
+
+            if (parent == null) {
+                throw new IllegalArgumentException("target path %s needs to have parent directory.".formatted(target));
+            }
+
+            FsUtil.createDirectory(parent);
+
             Template template1 = configuration.getTemplate(template);
 
-            try (FileWriter fileWriter = new FileWriter(distinction)) {
+            try (FileWriter fileWriter = new FileWriter(target)) {
                 template1.process(model, fileWriter);
             } catch (IOException | TemplateException e) {
                 throw new RuntimeException(e);

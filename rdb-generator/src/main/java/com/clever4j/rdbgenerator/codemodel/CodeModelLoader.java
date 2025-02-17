@@ -30,15 +30,14 @@ public final class CodeModelLoader {
     public CodeModel load() {
         TypeMapper typeMapper = new TypeMapper();
         ObjectNameProvider objectNameProvider = new ObjectNameProvider();
+
         List<RecordModel> recordModels = new ArrayList<>();
+        List<BaseDaoModel> baseDaoModels = new ArrayList<>();
         List<DaoModel> daoModels = new ArrayList<>();
+        List<BaseImplementationDaoModel> baseImplementationDaoModels = new ArrayList<>();
         List<ImplementationDaoModel> implementationDaoModels = new ArrayList<>();
 
         for (TableMetadata table : databaseMetadata.tables()) {
-            if (!table.name().equals("test_tag")) {
-                continue;
-            }
-
             if (isTableExcluded(table.name())) {
                 continue;
             }
@@ -75,41 +74,68 @@ public final class CodeModelLoader {
 
             recordModels.add(recordModel);
 
+            // baseDaoModel --------------------------------------------------------------------------------------------
+            BaseDaoModel baseDaoModel = new BaseDaoModel(
+                database.baseDaoPackageName() + "." + objectNameProvider.getBaseDaoSimpleName(table.name()),
+                database.baseDaoPackageName(),
+                objectNameProvider.getBaseDaoSimpleName(table.name()),
+                database,
+                recordModel
+            );
+
+            baseDaoModels.add(baseDaoModel);
+
+            // daoModel ------------------------------------------------------------------------------------------------
             DaoModel daoModel = new DaoModel(
-                database.daoPackageName() + "." + objectNameProvider.getDaoSimpleName(recordModel),
+                database.daoPackageName() + "." + objectNameProvider.getDaoSimpleName(table.name()),
                 database.daoPackageName(),
-                objectNameProvider.getDaoSimpleName(recordModel),
+                objectNameProvider.getDaoSimpleName(table.name()),
                 recordModel,
+                baseDaoModel,
                 database
             );
 
             daoModels.add(daoModel);
 
-            implementationDaoModels.add(new ImplementationDaoModel(
-                database.implementationDaoPackageName() + "." + objectNameProvider.getImplementationDaoSimpleName(daoModel),
-                database.implementationDaoPackageName(),
-                objectNameProvider.getImplementationDaoSimpleName(daoModel),
-                daoModel,
+            // baseImplementationDaoModel ------------------------------------------------------------------------------
+            BaseImplementationDaoModel baseImplementationDaoModel = new BaseImplementationDaoModel(
+                database.baseImplementationDaoPackageName() + "." + objectNameProvider.getBaseImplementationDaoSimpleName(table.name()),
+                database.baseImplementationDaoPackageName(),
+                objectNameProvider.getBaseImplementationDaoSimpleName(table.name()),
+                database,
                 recordModel,
-                database
-            ));
+                baseDaoModel,
+                daoModel
+            );
+
+            baseImplementationDaoModels.add(baseImplementationDaoModel);
+
+            // implementationDaoModel ----------------------------------------------------------------------------------
+            ImplementationDaoModel implementationDaoModel = new ImplementationDaoModel(
+                database.implementationDaoPackageName() + "." + objectNameProvider.getImplementationDaoSimpleName(table.name()),
+                database.implementationDaoPackageName(),
+                objectNameProvider.getImplementationDaoSimpleName(table.name()),
+                database,
+                recordModel,
+                baseDaoModel,
+                daoModel,
+                baseImplementationDaoModel
+            );
+
+            implementationDaoModels.add(implementationDaoModel);
         }
 
         return new CodeModel(
             unmodifiableList(recordModels),
+            unmodifiableList(baseDaoModels),
             unmodifiableList(daoModels),
+            unmodifiableList(baseImplementationDaoModels),
             unmodifiableList(implementationDaoModels)
         );
     }
 
     private boolean isTableExcluded(String tableName) {
-        // if (repository.getRecordGenerator().getExcludeRegex()) {
-
-        // }
-
-        System.out.printf("test");
-
-        return false;
+        return database.excludeTables().contains(tableName);
     }
 
     private Set<String> getPrimaryKeys(String tableName, DatabaseMetaData metaData) throws SQLException {

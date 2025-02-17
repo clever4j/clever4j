@@ -29,6 +29,7 @@ public class RecordGenerator {
         model.put("name", record.name());
         model.put("table", record.table());
         model.put("fields", record.fields());
+        model.put("database", record.database());
 
         templateProcessor.processRecordTemplate(model, "%s/%s.java".formatted(output, record.simpleName()));
     }

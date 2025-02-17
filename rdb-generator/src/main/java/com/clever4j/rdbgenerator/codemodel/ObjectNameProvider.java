@@ -20,15 +20,19 @@ public final class ObjectNameProvider {
         return "getBy" + NAMING_STYLE_CONVERTER.convert(columnName, NamingStyleConverter.NamingStyle.PASCAL_CASE) + "In";
     }
 
-    public String getDaoSimpleName(RecordModel record) {
-        return record.simpleName() + "Dao";
+    public String getBaseDaoSimpleName(String tableName) {
+        return NAMING_STYLE_CONVERTER.convert(tableName, NamingStyleConverter.NamingStyle.PASCAL_CASE) + "BaseDao";
     }
 
-    public String getWhereName(RecordModel record) {
-        return NAMING_STYLE_CONVERTER.convert(record.table().name(), NamingStyleConverter.NamingStyle.PASCAL_CASE) + "Where";
+    public String getDaoSimpleName(String tableName) {
+        return NAMING_STYLE_CONVERTER.convert(tableName, NamingStyleConverter.NamingStyle.PASCAL_CASE) + "Dao";
     }
 
-    public String getImplementationDaoSimpleName(DaoModel daoModel) {
-        return daoModel.simpleName() + "Impl";
+    public String getBaseImplementationDaoSimpleName(String tableName) {
+        return NAMING_STYLE_CONVERTER.convert(tableName, NamingStyleConverter.NamingStyle.PASCAL_CASE) + "DaoBaseImpl";
+    }
+
+    public String getImplementationDaoSimpleName(String tableName) {
+        return NAMING_STYLE_CONVERTER.convert(tableName, NamingStyleConverter.NamingStyle.PASCAL_CASE) + "DaoImpl";
     }
 }

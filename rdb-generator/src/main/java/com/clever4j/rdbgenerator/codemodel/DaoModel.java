@@ -8,7 +8,8 @@ public record DaoModel(
     String name,
     String packageName,
     String simpleName,
-    RecordModel record,
+    RecordModel recordModel,
+    BaseDaoModel baseDaoModel,
     Database database
 ) {
 }

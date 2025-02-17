@@ -7,7 +7,7 @@ import com.clever4j.rdbgenerator.codemodel.CodeModelLoader;
 import com.clever4j.rdbgenerator.configuration.Configuration;
 import com.clever4j.rdbgenerator.configuration.Database;
 import com.clever4j.rdbgenerator.freemarker.TemplateProcessor;
-import com.clever4j.rdbgenerator.codegenerator.RepositoryCodeGenerator;
+import com.clever4j.rdbgenerator.codegenerator.DatabaseGenerator;
 import com.clever4j.rdbgenerator.services.Services;
 import picocli.CommandLine;
 import picocli.CommandLine.Command;
@@ -51,8 +51,8 @@ public final class MainCommand implements Callable<Integer> {
             CodeModelLoader codeModelLoader = new CodeModelLoader(database, databaseMetadata);
             CodeModel codeModel = codeModelLoader.load();
 
-            RepositoryCodeGenerator repositoryCodeGenerator = new RepositoryCodeGenerator(database, codeModel, templateProcessor);
-            repositoryCodeGenerator.run();
+            DatabaseGenerator databaseGenerator = new DatabaseGenerator(database, codeModel, templateProcessor);
+            databaseGenerator.run();
         }
 
         return 0;

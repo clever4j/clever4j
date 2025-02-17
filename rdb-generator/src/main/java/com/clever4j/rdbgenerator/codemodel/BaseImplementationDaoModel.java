@@ -4,14 +4,13 @@ import com.clever4j.lang.AllNonnullByDefault;
 import com.clever4j.rdbgenerator.configuration.Database;
 
 @AllNonnullByDefault
-public record ImplementationDaoModel(
+public record BaseImplementationDaoModel(
     String name,
     String packageName,
     String simpleName,
     Database database,
-    RecordModel record,
+    RecordModel recordModel,
     BaseDaoModel baseDaoModel,
-    DaoModel daoModel,
-    BaseImplementationDaoModel baseImplementationDaoModel
+    DaoModel daoModel
 ) {
 }
