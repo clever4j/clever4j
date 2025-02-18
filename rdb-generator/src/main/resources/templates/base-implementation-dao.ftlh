@@ -19,10 +19,10 @@ import ${recordModel.name()};
 
 <#list database.implementationDaoAnnotations() as a>@${a}</#list>
 @SuppressWarnings({"DataFlowIssue", "unused", "DuplicatedCode", "SqlSourceToSinkFlow"})
-public abstract class ${simpleName} implements ${daoModel.name()} {
+public abstract class ${simpleName} {
 
-    private final ConnectionProvider connectionProvider;
-    private final PostgreSqlBuilder builder = new PostgreSqlBuilder();
+    protected final ConnectionProvider connectionProvider;
+    protected final PostgreSqlBuilder builder = new PostgreSqlBuilder();
 
     public ${simpleName}(ConnectionProvider connectionProvider) {
         this.connectionProvider = connectionProvider;
@@ -51,11 +51,7 @@ public abstract class ${simpleName} implements ${daoModel.name()} {
 
     @jakarta.annotation.Nullable
     public ${recordModel.simpleName()} getById(<#list recordModel.primaryKeys() as f>${f.type().getName()} ${f.name()}<#if f?has_next>,</#if></#list>, Connection connection) {
-        Select select = Select.build()
-        <#list recordModel.fields() as f>
-            .column("${f.columnName()}")
-        </#list>
-            .from("${recordModel.table().name()}")
+        Select select = buildSelect()
             .where(where -> {
             <#list recordModel.primaryKeys() as f>
                 where.equal("${f.columnName()}", ${f.name()});
@@ -67,8 +63,23 @@ public abstract class ${simpleName} implements ${daoModel.name()} {
         return fetchOne(sql, context, connection);
     }
 
+    protected Select buildSelect() {
+        return Select.build()
+        <#list recordModel.fields() as f>
+            .column("${f.columnName()}")
+        </#list>
+            .from("${recordModel.table().name()}");
+    }
+
     @jakarta.annotation.Nullable
-    private ${recordModel.simpleName()} fetchOne(String query, BuildContext context, Connection connection) {
+    protected ${recordModel.simpleName()} fetchOne(Select select, Connection connection) {
+        BuildContext buildContext = new BuildContext();
+        String sql = builder.build(select, buildContext);
+        return fetchOne(sql, context, connection);
+    }
+
+    @jakarta.annotation.Nullable
+    protected ${recordModel.simpleName()} fetchOne(String query, BuildContext context, Connection connection) {
         List<${recordModel.simpleName()}> result = fetch(query, context, connection);
 
         if (result.isEmpty()) {
@@ -80,7 +91,13 @@ public abstract class ${simpleName} implements ${daoModel.name()} {
         }
     }
 
-    private List<${recordModel.simpleName()}> fetch(String query, BuildContext context, Connection connection) {
+    protected List<${recordModel.simpleName()}> fetch(Select select, Connection connection) {
+        BuildContext buildContext = new BuildContext();
+        String sql = builder.build(select, buildContext);
+        return fetch(sql, context, connection);
+    }
+
+    protected List<${recordModel.simpleName()}> fetch(String query, BuildContext context, Connection connection) {
         List<${recordModel.simpleName()}> result = new ArrayList<>();
 
         try (PreparedStatement statement = connection.prepareStatement(query)) {

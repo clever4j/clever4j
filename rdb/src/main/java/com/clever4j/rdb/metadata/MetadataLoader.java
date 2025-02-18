@@ -34,7 +34,7 @@ public final class MetadataLoader {
         while (resultSet.next()) {
             String tableName = resultSet.getString("TABLE_NAME");
 
-            if (!tableName.equals("test_tag")) {
+            if (!tableName.equals("user")) {
                 continue;
             }
 

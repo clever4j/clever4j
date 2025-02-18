@@ -7,7 +7,7 @@ import com.clever4j.rdb.sql.Where.Condition;
 import static java.util.Objects.requireNonNull;
 
 @AllNonnullByDefault
-public final class PostgreSqlBuilder {
+public final class PostgreSqlBuilder implements SqlBuilder {
 
     public String build(Expression expression, BuildContext context) {
         StringBuilder sql = new StringBuilder();

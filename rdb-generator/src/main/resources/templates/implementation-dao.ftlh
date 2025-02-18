@@ -6,7 +6,7 @@ import ${baseImplementationDaoModel.name()};
 
 <#list database.baseImplementationDaoAnnotations() as a>@${a}</#list>
 @SuppressWarnings({"unused", "DuplicatedCode"})
-public class ${simpleName} extends ${baseImplementationDaoModel.simpleName()} {
+public class ${simpleName} extends ${baseImplementationDaoModel.simpleName()} implements ${daoModel.name()} {
     public ${simpleName}(ConnectionProvider connectionProvider) {
         super(connectionProvider);
     }
