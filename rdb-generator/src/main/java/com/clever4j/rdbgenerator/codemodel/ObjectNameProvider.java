@@ -8,6 +8,10 @@ public final class ObjectNameProvider {
 
     private static final NamingStyleConverter NAMING_STYLE_CONVERTER = new NamingStyleConverter();
 
+    public String formatPascalCase(String input) {
+        return NAMING_STYLE_CONVERTER.convert(input, NamingStyleConverter.NamingStyle.PASCAL_CASE);
+    }
+
     public String getRecordName(String tableName) {
         return NAMING_STYLE_CONVERTER.convert(tableName, NamingStyleConverter.NamingStyle.PASCAL_CASE) + "Record";
     }
@@ -28,8 +32,8 @@ public final class ObjectNameProvider {
         return NAMING_STYLE_CONVERTER.convert(tableName, NamingStyleConverter.NamingStyle.PASCAL_CASE) + "Dao";
     }
 
-    public String getBaseImplementationDaoSimpleName(String tableName) {
-        return NAMING_STYLE_CONVERTER.convert(tableName, NamingStyleConverter.NamingStyle.PASCAL_CASE) + "DaoBaseImpl";
+    public String getImplementationDaoTemplateSimpleName(String tableName) {
+        return NAMING_STYLE_CONVERTER.convert(tableName, NamingStyleConverter.NamingStyle.PASCAL_CASE) + "DaoImplTemplate";
     }
 
     public String getImplementationDaoSimpleName(String tableName) {

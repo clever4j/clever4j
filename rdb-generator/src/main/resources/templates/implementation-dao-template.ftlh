@@ -17,7 +17,6 @@ import com.clever4j.rdb.sql.Select;
 import com.clever4j.rdb.sql.PostgreSqlBuilder;
 import ${recordModel.name()};
 
-<#list database.implementationDaoAnnotations() as a>@${a}</#list>
 @SuppressWarnings({"DataFlowIssue", "unused", "DuplicatedCode", "SqlSourceToSinkFlow"})
 public abstract class ${simpleName} {
 
@@ -63,6 +62,23 @@ public abstract class ${simpleName} {
         return fetchOne(sql, context, connection);
     }
 
+    // getByIn ---------------------------------------------------------------------------------------------------------
+    <#list recordModel.fields() as f>
+    public List<${recordModel.simpleName()}> getBy${f.pascalName()}In(List<${f.type().getName()}> in, Connection connection) {
+        Select select = buildSelect()
+            .where(where -> {
+                where.equal("${f.columnName()}", in);
+            });
+
+        BuildContext context = new BuildContext();
+        String sql = builder.build(select, context);
+
+        return fetch(sql, context, connection);
+    }
+
+    </#list>
+    // -----------------------------------------------------------------------------------------------------------------
+
     protected Select buildSelect() {
         return Select.build()
         <#list recordModel.fields() as f>
@@ -73,8 +89,8 @@ public abstract class ${simpleName} {
 
     @jakarta.annotation.Nullable
     protected ${recordModel.simpleName()} fetchOne(Select select, Connection connection) {
-        BuildContext buildContext = new BuildContext();
-        String sql = builder.build(select, buildContext);
+        BuildContext context = new BuildContext();
+        String sql = builder.build(select, context);
         return fetchOne(sql, context, connection);
     }
 
@@ -92,8 +108,8 @@ public abstract class ${simpleName} {
     }
 
     protected List<${recordModel.simpleName()}> fetch(Select select, Connection connection) {
-        BuildContext buildContext = new BuildContext();
-        String sql = builder.build(select, buildContext);
+        BuildContext context = new BuildContext();
+        String sql = builder.build(select, context);
         return fetch(sql, context, connection);
     }
 
@@ -144,11 +160,11 @@ public abstract class ${simpleName} {
             </#list>
         ;
 
-        BuildContext buildContext = new BuildContext();
-        String sql = builder.build(insert, buildContext);
+        BuildContext context = new BuildContext();
+        String sql = builder.build(insert, context);
 
         try (PreparedStatement statement = connection.prepareStatement(sql)) {
-            buildContext.prepareStatement(statement);
+            context.prepareStatement(statement);
             statement.execute();
         } catch (SQLException e) {
             throw new RuntimeException(e);
@@ -169,11 +185,11 @@ public abstract class ${simpleName} {
             </#list>
             });
 
-        BuildContext buildContext = new BuildContext();
-        String sql = builder.build(delete, buildContext);
+        BuildContext context = new BuildContext();
+        String sql = builder.build(delete, context);
 
         try (PreparedStatement statement = connection.prepareStatement(sql)) {
-            buildContext.prepareStatement(statement);
+            context.prepareStatement(statement);
             statement.execute();
         } catch (SQLException e) {
             throw new RuntimeException(e);
@@ -188,11 +204,11 @@ public abstract class ${simpleName} {
         Delete delete = Delete.build()
             .table("${recordModel.table().name()}");
 
-        BuildContext buildContext = new BuildContext();
-        String sql = builder.build(delete, buildContext);
+        BuildContext context = new BuildContext();
+        String sql = builder.build(delete, context);
 
         try (PreparedStatement statement = connection.prepareStatement(sql)) {
-            buildContext.prepareStatement(statement);
+            context.prepareStatement(statement);
             statement.execute();
         } catch (SQLException e) {
             throw new RuntimeException(e);
@@ -216,11 +232,11 @@ public abstract class ${simpleName} {
             </#list>
             });
 
-        BuildContext buildContext = new BuildContext();
-        String sql = builder.build(update, buildContext);
+        BuildContext context = new BuildContext();
+        String sql = builder.build(update, context);
 
         try (PreparedStatement statement = connection.prepareStatement(sql)) {
-            buildContext.prepareStatement(statement);
+            context.prepareStatement(statement);
             statement.execute();
         } catch (SQLException e) {
             throw new RuntimeException(e);

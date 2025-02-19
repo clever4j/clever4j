@@ -12,7 +12,7 @@ public record DaoModel(
     Path output,
     String simpleName,
     RecordModel recordModel,
-    TemplateDaoModel templateDaoModel,
+    DaoTemplateModel daoTemplateModel,
     Database database
 ) {
 }

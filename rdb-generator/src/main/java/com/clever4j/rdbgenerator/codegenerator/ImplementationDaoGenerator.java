@@ -5,7 +5,6 @@ import com.clever4j.lang.AllNonnullByDefault;
 import com.clever4j.rdbgenerator.codemodel.ImplementationDaoModel;
 import com.clever4j.rdbgenerator.freemarker.TemplateProcessor;
 
-import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -13,17 +12,15 @@ import java.util.Map;
 public class ImplementationDaoGenerator {
 
     private final ImplementationDaoModel implementationDaoModel;
-    private final Path output;
     private final TemplateProcessor templateProcessor;
 
-    public ImplementationDaoGenerator(ImplementationDaoModel implementationDaoModel, Path output, TemplateProcessor templateProcessor) {
+    public ImplementationDaoGenerator(ImplementationDaoModel implementationDaoModel, TemplateProcessor templateProcessor) {
         this.implementationDaoModel = implementationDaoModel;
-        this.output = output;
         this.templateProcessor = templateProcessor;
     }
 
     public void generate() {
-        String target = "%s/%s.java".formatted(output, implementationDaoModel.simpleName());
+        String target = implementationDaoModel.output().toString();
 
         if (FsUtil.exists(target)) {
             return;
@@ -35,10 +32,10 @@ public class ImplementationDaoGenerator {
         model.put("packageName", implementationDaoModel.packageName());
         model.put("simpleName", implementationDaoModel.simpleName());
         model.put("database", implementationDaoModel.database());
-        model.put("recordModel", implementationDaoModel.record());
+        model.put("recordModel", implementationDaoModel.recordModel());
         model.put("daoModel", implementationDaoModel.daoModel());
-        model.put("baseImplementationDaoModel", implementationDaoModel.baseImplementationDaoModel());
+        model.put("implementationDaoTemplateModel", implementationDaoModel.implementationDaoTemplateModel());
 
-        templateProcessor.processImplementationDaoTemplate(model, "%s/%s.java".formatted(output, implementationDaoModel.simpleName()));
+        templateProcessor.processImplementationDao(model, target);
     }
 }

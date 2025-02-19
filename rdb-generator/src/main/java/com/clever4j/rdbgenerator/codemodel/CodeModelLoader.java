@@ -5,6 +5,8 @@ import com.clever4j.rdb.metadata.ColumnMetadata;
 import com.clever4j.rdb.metadata.DatabaseMetadata;
 import com.clever4j.rdb.metadata.TableMetadata;
 import com.clever4j.rdbgenerator.configuration.Database;
+import com.clever4j.text.NamingStyleConverter;
+import com.clever4j.text.NamingStyleConverter.NamingStyle;
 
 import java.nio.file.Path;
 import java.sql.DatabaseMetaData;
@@ -33,9 +35,9 @@ public final class CodeModelLoader {
         TypeMapper typeMapper = new TypeMapper();
 
         List<RecordModel> recordModels = new ArrayList<>();
-        List<TemplateDaoModel> templateDaoModels = new ArrayList<>();
+        List<DaoTemplateModel> daoTemplateModels = new ArrayList<>();
         List<DaoModel> daoModels = new ArrayList<>();
-        List<BaseImplementationDaoModel> baseImplementationDaoModels = new ArrayList<>();
+        List<ImplementationDaoTemplateModel> implementationDaoTemplateModels = new ArrayList<>();
         List<ImplementationDaoModel> implementationDaoModels = new ArrayList<>();
 
         for (TableMetadata table : databaseMetadata.tables()) {
@@ -50,6 +52,7 @@ public final class CodeModelLoader {
                 fieldModels.add(new RecordFieldModel(
                     typeMapper.map(column.type()),
                     objectNameProvider.getFieldName(column.name()),
+                    objectNameProvider.formatPascalCase(column.name()),
                     objectNameProvider.getByInName(column.name()),
                     table.name(),
                     column.name(),
@@ -58,52 +61,33 @@ public final class CodeModelLoader {
                 ));
             }
 
-            // recordModel --------------------------------------------------------------------------------------------------
+            // recordModel ---------------------------------------------------------------------------------------------
             RecordModel recordModel = createRecordModel(table, fieldModels);
-
             recordModels.add(recordModel);
 
-            // templateDaoModel --------------------------------------------------------------------------------------------
-            TemplateDaoModel templateDaoModel = createTemplateDaoModel(table, recordModel);
-
-            templateDaoModels.add(templateDaoModel);
+            // daoTemplateModel ----------------------------------------------------------------------------------------
+            DaoTemplateModel daoTemplateModel = createTemplateDaoModel(table, recordModel);
+            daoTemplateModels.add(daoTemplateModel);
 
             // daoModel ------------------------------------------------------------------------------------------------
-            daoModels.add(createDaoModel(table, recordModel, templateDaoModel));
+            DaoModel daoModel = createDaoModel(table, recordModel, daoTemplateModel);
+            daoModels.add(daoModel);
 
-            // // baseImplementationDaoModel ------------------------------------------------------------------------------
-            // BaseImplementationDaoModel baseImplementationDaoModel = new BaseImplementationDaoModel(
-            //     database.baseImplementationDaoPackageName() + "." + objectNameProvider.getBaseImplementationDaoSimpleName(table.name()),
-            //     database.baseImplementationDaoPackageName(),
-            //     objectNameProvider.getBaseImplementationDaoSimpleName(table.name()),
-            //     database,
-            //     recordModel,
-            //     templateDaoModel,
-            //     daoModel
-            // );
+            // implementationDaoTemplateModel --------------------------------------------------------------------------
+            ImplementationDaoTemplateModel implementationDaoTemplateModel = createImplementationDaoTemplateModel(table,
+                recordModel, daoTemplateModel, daoModel);
+            implementationDaoTemplateModels.add(implementationDaoTemplateModel);
 
-            // baseImplementationDaoModels.add(baseImplementationDaoModel);
-
-            // // implementationDaoModel ----------------------------------------------------------------------------------
-            // ImplementationDaoModel implementationDaoModel = new ImplementationDaoModel(
-            //     database.implementationDaoPackageName() + "." + objectNameProvider.getImplementationDaoSimpleName(table.name()),
-            //     database.implementationDaoPackageName(),
-            //     objectNameProvider.getImplementationDaoSimpleName(table.name()),
-            //     database,
-            //     recordModel,
-            //     templateDaoModel,
-            //     daoModel,
-            //     baseImplementationDaoModel
-            // );
-
-            // implementationDaoModels.add(implementationDaoModel);
+            // implementationDaoModel ----------------------------------------------------------------------------------
+            implementationDaoModels.add(createImplementationDaoModel(table, recordModel, daoTemplateModel, daoModel,
+                implementationDaoTemplateModel));
         }
 
         return new CodeModel(
             unmodifiableList(recordModels),
-            unmodifiableList(templateDaoModels),
+            unmodifiableList(daoTemplateModels),
             unmodifiableList(daoModels),
-            unmodifiableList(baseImplementationDaoModels),
+            unmodifiableList(implementationDaoTemplateModels),
             unmodifiableList(implementationDaoModels)
         );
     }
@@ -129,30 +113,47 @@ public final class CodeModelLoader {
 
     }
 
-    private TemplateDaoModel createTemplateDaoModel(TableMetadata table, RecordModel recordModel) {
+    private DaoTemplateModel createTemplateDaoModel(TableMetadata table, RecordModel recordModel) {
         String simpleName = objectNameProvider.getTemplateDaoSimpleName(table.name());
         String packageName = database.packageName() + ".generated";
         String name = packageName + "." + simpleName;
         Path output = database.output().resolve(Path.of("generated", simpleName + ".java"));
 
-        return  new TemplateDaoModel(name, packageName, output, simpleName, database, recordModel);
+        return new DaoTemplateModel(name, packageName, output, simpleName, database, recordModel);
     }
 
-    private DaoModel createDaoModel(TableMetadata table, RecordModel recordModel, TemplateDaoModel templateDaoModel) {
+    private DaoModel createDaoModel(TableMetadata table, RecordModel recordModel, DaoTemplateModel daoTemplateModel) {
         String simpleName = objectNameProvider.getDaoSimpleName(table.name());
-        String name = database.packageName() + "." + objectNameProvider.getDaoSimpleName(table.name());
         String packageName = database.packageName() + ".dao";
+        String name = packageName + "." + simpleName;
         Path output = database.output().resolve(Path.of("dao", simpleName + ".java"));
 
-        return new DaoModel(
-            name,
-            packageName,
-            output,
-            simpleName,
-            recordModel,
-            templateDaoModel,
-            database
-        );
+        return new DaoModel(name, packageName, output, simpleName, recordModel, daoTemplateModel, database);
+    }
+
+    private ImplementationDaoTemplateModel createImplementationDaoTemplateModel(TableMetadata table,
+        RecordModel recordModel, DaoTemplateModel daoTemplateModel, DaoModel daoModel) {
+
+        String packageName = database.packageName() + ".generated";
+        String simpleName = objectNameProvider.getImplementationDaoTemplateSimpleName(table.name());
+        String name = packageName + "." + simpleName;
+        Path output = database.output().resolve(Path.of("generated", simpleName + ".java"));
+
+        return new ImplementationDaoTemplateModel(name, packageName, output, simpleName, database, recordModel,
+            daoTemplateModel, daoModel);
+    }
+
+    private ImplementationDaoModel createImplementationDaoModel(TableMetadata table, RecordModel recordModel, DaoTemplateModel daoTemplateModel,
+        DaoModel daoModel, ImplementationDaoTemplateModel implementationDaoTemplateModel) {
+
+        String packageName = database.packageName() + ".dao";
+        String simpleName = objectNameProvider.getImplementationDaoSimpleName(table.name());
+        String name = packageName + "." + simpleName;
+        Path output = database.output().resolve(Path.of("dao", simpleName + ".java"));
+
+        return new ImplementationDaoModel(name, packageName, output, simpleName, database, recordModel,
+            daoTemplateModel, daoModel, implementationDaoTemplateModel);
+
     }
 
     private boolean isTableExcluded(String tableName) {

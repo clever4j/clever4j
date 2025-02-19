@@ -1,13 +1,13 @@
 package com.clever4j.rdbgenerator.codegenerator;
 
 import com.clever4j.lang.AllNonnullByDefault;
-import com.clever4j.rdbgenerator.codemodel.*;
+import com.clever4j.rdbgenerator.codemodel.ImplementationDaoTemplateModel;
+import com.clever4j.rdbgenerator.codemodel.RecordFieldModel;
 import com.clever4j.rdbgenerator.freemarker.TemplateProcessor;
 import freemarker.ext.beans.GenericObjectModel;
 import freemarker.template.TemplateMethodModelEx;
 import freemarker.template.TemplateModelException;
 
-import java.nio.file.Path;
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
@@ -15,34 +15,32 @@ import java.util.Map;
 import java.util.UUID;
 
 @AllNonnullByDefault
-public class BaseImplementationDaoGenerator {
+public class ImplementationDaoTemplateGenerator {
 
-    private final BaseImplementationDaoModel baseImplementationDaoModel;
-    private final Path output;
+    private final ImplementationDaoTemplateModel implementationDaoTemplateModel;
     private final TemplateProcessor templateProcessor;
 
-    public BaseImplementationDaoGenerator(BaseImplementationDaoModel baseImplementationDaoModel, Path output, TemplateProcessor templateProcessor) {
-        this.baseImplementationDaoModel = baseImplementationDaoModel;
-        this.output = output;
+    public ImplementationDaoTemplateGenerator(ImplementationDaoTemplateModel implementationDaoTemplateModel, TemplateProcessor templateProcessor) {
+        this.implementationDaoTemplateModel = implementationDaoTemplateModel;
         this.templateProcessor = templateProcessor;
     }
 
     public void generate() {
         Map<String, Object> model = new HashMap<>();
 
-        model.put("name", baseImplementationDaoModel.name());
-        model.put("packageName", baseImplementationDaoModel.packageName());
-        model.put("simpleName", baseImplementationDaoModel.simpleName());
-        model.put("database", baseImplementationDaoModel.database());
-        model.put("recordModel", baseImplementationDaoModel.recordModel());
-        model.put("baseDaoModel", baseImplementationDaoModel.templateDaoModel());
-        model.put("daoModel", baseImplementationDaoModel.daoModel());
+        model.put("name", implementationDaoTemplateModel.name());
+        model.put("packageName", implementationDaoTemplateModel.packageName());
+        model.put("simpleName", implementationDaoTemplateModel.simpleName());
+        model.put("database", implementationDaoTemplateModel.database());
+        model.put("recordModel", implementationDaoTemplateModel.recordModel());
+        model.put("baseDaoModel", implementationDaoTemplateModel.daoTemplateModel());
+        model.put("daoModel", implementationDaoTemplateModel.daoModel());
 
         // // functions
         model.put("generateCreateJavaType", new GenerateCreateJavaType());
         model.put("setStatementObject", new SetStatementObject());
 
-        templateProcessor.processBaseImplementationDaoTemplate(model, "%s/%s.java".formatted(output, baseImplementationDaoModel.simpleName()));
+        templateProcessor.processImplementationDaoTemplate(model, implementationDaoTemplateModel.output().toString());
     }
 
     private static class GenerateCreateJavaType implements TemplateMethodModelEx {

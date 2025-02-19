@@ -4,7 +4,6 @@ import com.clever4j.lang.AllNonnullByDefault;
 import com.clever4j.rdbgenerator.codemodel.DaoModel;
 import com.clever4j.rdbgenerator.freemarker.TemplateProcessor;
 
-import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -29,7 +28,7 @@ public class DaoGenerator {
         model.put("packageName", daoModel.packageName());
         model.put("simpleName", daoModel.simpleName());
         model.put("recordModel", daoModel.recordModel());
-        model.put("templateDaoModel", daoModel.templateDaoModel());
+        model.put("templateDaoModel", daoModel.daoTemplateModel());
         model.put("database", daoModel.database());
 
         templateProcessor.processDaoTemplate(model, daoModel.output().toString());

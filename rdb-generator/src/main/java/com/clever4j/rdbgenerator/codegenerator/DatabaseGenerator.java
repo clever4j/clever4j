@@ -26,8 +26,8 @@ public final class DatabaseGenerator {
         }
 
         // templateDaoModel --------------------------------------------------------------------------------------------
-        for (TemplateDaoModel templateDaoModel : codeModel.templateDaoModels()) {
-            new TemplateDaoGenerator(templateDaoModel, templateProcessor)
+        for (DaoTemplateModel daoTemplateModel : codeModel.daoTemplateModels()) {
+            new DaoTemplateGenerator(daoTemplateModel, templateProcessor)
                 .generate();
         }
 
@@ -36,16 +36,14 @@ public final class DatabaseGenerator {
             new DaoGenerator(dao, templateProcessor).generate();
         }
 
-        // // base-implementation-dao ---------------------------------------------------------------------------------
-        // for (BaseImplementationDaoModel baseImplementationDaoModel : codeModel.baseImplementationDaoModels()) {
-        //     new BaseImplementationDaoGenerator(baseImplementationDaoModel, database.baseImplementationDaoOutput(),
-        //         templateProcessor).generate();
-        // }
+        // implementationDaoTemplateModel ------------------------------------------------------------------------------
+        for (ImplementationDaoTemplateModel implementationDaoTemplateModel : codeModel.implementationDaoTemplateModels()) {
+            new ImplementationDaoTemplateGenerator(implementationDaoTemplateModel, templateProcessor).generate();
+        }
 
-        // // implementation-dao ---------------------------------------------------------------------------------------
-        // for (ImplementationDaoModel implementationDaoModel : codeModel.implementationDaoModels()) {
-        //     new ImplementationDaoGenerator(implementationDaoModel, database.implementationDaoOutput(),
-        //         templateProcessor).generate();
-        // }
+        // implementation-dao ---------------------------------------------------------------------------------------
+        for (ImplementationDaoModel implementationDaoModel : codeModel.implementationDaoModels()) {
+            new ImplementationDaoGenerator(implementationDaoModel, templateProcessor).generate();
+        }
     }
 }
