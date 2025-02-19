@@ -12,12 +12,10 @@ import java.util.Map;
 public class RecordGenerator {
 
     private final RecordModel record;
-    private final Path output;
     private final TemplateProcessor templateProcessor;
 
-    public RecordGenerator(RecordModel record, Path output, TemplateProcessor templateProcessor) {
+    public RecordGenerator(RecordModel record, TemplateProcessor templateProcessor) {
         this.record = record;
-        this.output = output;
         this.templateProcessor = templateProcessor;
     }
 
@@ -31,6 +29,6 @@ public class RecordGenerator {
         model.put("fields", record.fields());
         model.put("database", record.database());
 
-        templateProcessor.processRecordTemplate(model, "%s/%s.java".formatted(output, record.simpleName()));
+        templateProcessor.processRecordTemplate(model, record.output().toString());
     }
 }

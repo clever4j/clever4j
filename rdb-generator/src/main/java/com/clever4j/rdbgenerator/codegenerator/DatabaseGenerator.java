@@ -19,34 +19,33 @@ public final class DatabaseGenerator {
     }
 
     public void run() {
-        // recordModel ------------------------------------------------------------------------------------------------------
+        // recordModel -------------------------------------------------------------------------------------------------
         for (RecordModel recordModel : codeModel.recordModels()) {
-            new RecordGenerator(recordModel, database.recordOutput(), templateProcessor)
+            new RecordGenerator(recordModel, templateProcessor)
                 .generate();
         }
 
-        // dao ---------------------------------------------------------------------------------------------------------
-        for (BaseDaoModel baseDaoModel : codeModel.baseDaoModels()) {
-            new BaseDaoGenerator(baseDaoModel, database.baseDaoOutput(), templateProcessor)
+        // templateDaoModel --------------------------------------------------------------------------------------------
+        for (TemplateDaoModel templateDaoModel : codeModel.templateDaoModels()) {
+            new TemplateDaoGenerator(templateDaoModel, templateProcessor)
                 .generate();
         }
 
-        // dao ---------------------------------------------------------------------------------------------------------
+        // dao ------------------------------------------------------------------------------------------------------
         for (DaoModel dao : codeModel.daoModels()) {
-            new DaoGenerator(dao, database.daoOutput(), templateProcessor)
-                .generate();
+            new DaoGenerator(dao, templateProcessor).generate();
         }
 
-        // base-implementation-dao ---------------------------------------------------------------------------------
-        for (BaseImplementationDaoModel baseImplementationDaoModel : codeModel.baseImplementationDaoModels()) {
-            new BaseImplementationDaoGenerator(baseImplementationDaoModel, database.baseImplementationDaoOutput(),
-                templateProcessor).generate();
-        }
+        // // base-implementation-dao ---------------------------------------------------------------------------------
+        // for (BaseImplementationDaoModel baseImplementationDaoModel : codeModel.baseImplementationDaoModels()) {
+        //     new BaseImplementationDaoGenerator(baseImplementationDaoModel, database.baseImplementationDaoOutput(),
+        //         templateProcessor).generate();
+        // }
 
-        // implementation-dao ------------------------------------------------------------------------------------------
-        for (ImplementationDaoModel implementationDaoModel : codeModel.implementationDaoModels()) {
-            new ImplementationDaoGenerator(implementationDaoModel, database.implementationDaoOutput(),
-                templateProcessor).generate();
-        }
+        // // implementation-dao ---------------------------------------------------------------------------------------
+        // for (ImplementationDaoModel implementationDaoModel : codeModel.implementationDaoModels()) {
+        //     new ImplementationDaoGenerator(implementationDaoModel, database.implementationDaoOutput(),
+        //         templateProcessor).generate();
+        // }
     }
 }

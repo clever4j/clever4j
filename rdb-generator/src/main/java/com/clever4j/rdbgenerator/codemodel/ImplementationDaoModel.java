@@ -10,7 +10,7 @@ public record ImplementationDaoModel(
     String simpleName,
     Database database,
     RecordModel record,
-    BaseDaoModel baseDaoModel,
+    TemplateDaoModel templateDaoModel,
     DaoModel daoModel,
     BaseImplementationDaoModel baseImplementationDaoModel
 ) {

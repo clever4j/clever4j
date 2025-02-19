@@ -2,7 +2,6 @@ package com.clever4j.rdbgenerator.codegenerator;
 
 import com.clever4j.lang.AllNonnullByDefault;
 import com.clever4j.rdbgenerator.codemodel.*;
-import com.clever4j.rdbgenerator.configuration.Database;
 import com.clever4j.rdbgenerator.freemarker.TemplateProcessor;
 import freemarker.ext.beans.GenericObjectModel;
 import freemarker.template.TemplateMethodModelEx;
@@ -36,7 +35,7 @@ public class BaseImplementationDaoGenerator {
         model.put("simpleName", baseImplementationDaoModel.simpleName());
         model.put("database", baseImplementationDaoModel.database());
         model.put("recordModel", baseImplementationDaoModel.recordModel());
-        model.put("baseDaoModel", baseImplementationDaoModel.baseDaoModel());
+        model.put("baseDaoModel", baseImplementationDaoModel.templateDaoModel());
         model.put("daoModel", baseImplementationDaoModel.daoModel());
 
         // // functions

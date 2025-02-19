@@ -14,23 +14,12 @@ public record Database(
 
     List<String> excludeTables,
 
-    String recordPackageName,
-    Path recordOutput,
+    String packageName,
+    Path output,
+
     List<String> recordAnnotations,
-
-    String baseDaoPackageName,
-    Path baseDaoOutput,
-
-    String daoPackageName,
-    Path daoOutput,
     List<String> daoAnnotations,
-
-    String baseImplementationDaoPackageName,
-    Path baseImplementationDaoOutput,
     List<String> baseImplementationDaoAnnotations,
-
-    String implementationDaoPackageName,
-    Path implementationDaoOutput,
     List<String> implementationDaoAnnotations
 ) {
 

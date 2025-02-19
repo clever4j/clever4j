@@ -20,8 +20,8 @@ public final class ObjectNameProvider {
         return "getBy" + NAMING_STYLE_CONVERTER.convert(columnName, NamingStyleConverter.NamingStyle.PASCAL_CASE) + "In";
     }
 
-    public String getBaseDaoSimpleName(String tableName) {
-        return NAMING_STYLE_CONVERTER.convert(tableName, NamingStyleConverter.NamingStyle.PASCAL_CASE) + "BaseDao";
+    public String getTemplateDaoSimpleName(String tableName) {
+        return NAMING_STYLE_CONVERTER.convert(tableName, NamingStyleConverter.NamingStyle.PASCAL_CASE) + "DaoTemplate";
     }
 
     public String getDaoSimpleName(String tableName) {

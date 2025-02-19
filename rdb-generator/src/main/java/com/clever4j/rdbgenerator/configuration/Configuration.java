@@ -43,23 +43,15 @@ public class Configuration {
                 readString(database.dbPassword(), "repository.%s.db-password is required".formatted(id)),
                 readStringList(database.excludeTables(), false, ""),
 
-                readString(database.recordPackageName(), "repository.%s.recordModel-package-name is required".formatted(id)),
-                readPath(database.recordOutput(), "repository.%s.recordModel-output is required".formatted(id)),
+                readString(database.packageName(), "repository.%s.package-name is required".formatted(id)),
+                readPath(database.output(), "repository.%s.output is required".formatted(id)),
+
                 readStringList(database.recordAnnotations(), false, ""),
 
-                readString(database.baseDaoPackageName(), "repository.%s.base-dao-package-name is required".formatted(id)),
-                readPath(database.baseDaoOutput(), "repository.%s.base-dao-package-name is required".formatted(id)),
-
-                readString(database.daoPackageName(), "repository.%s.dao-package-name is required".formatted(id)),
-                readPath(database.daoOutput(), "repository.%s.dao-output is required".formatted(id)),
                 readStringList(database.daoAnnotations(), false, ""),
 
-                readString(database.baseImplementationDaoPackageName(), "repository.%s.base-implementation-dao-package-name is required".formatted(id)),
-                readPath(database.baseImplementationDaoOutput(), "repository.%s.base-implementation-dao-output is required".formatted(id)),
                 readStringList(database.baseImplementationDaoAnnotations(), false, ""),
 
-                readString(database.implementationDaoPackageName(), "repository.%s.implementation-dao-package-name is required".formatted(id)),
-                readPath(database.implementationDaoOutput(), "repository.%s.implementation-dao-output is required".formatted(id)),
                 readStringList(database.implementationDaoAnnotations(), false, "")
             ));
         }
