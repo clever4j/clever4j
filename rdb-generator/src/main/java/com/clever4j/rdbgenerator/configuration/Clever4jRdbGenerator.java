@@ -28,6 +28,9 @@ public record Clever4jRdbGenerator(
         @JsonProperty("exclude-tables")
         List<String> excludeTables,
 
+        @JsonProperty("only-tables")
+        List<String> onlyTables,
+
         @JsonProperty("package-name")
         String packageName,
 

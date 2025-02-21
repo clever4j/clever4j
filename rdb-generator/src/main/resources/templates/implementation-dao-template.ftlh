@@ -64,10 +64,10 @@ public abstract class ${simpleName} {
 
     // getByIn ---------------------------------------------------------------------------------------------------------
     <#list recordModel.fields() as f>
-    public List<${recordModel.simpleName()}> getBy${f.pascalName()}In(List<${f.type().getName()}> in, Connection connection) {
+    protected List<${recordModel.simpleName()}> getBy${f.pascalName()}In(List<${f.type().getName()}> in, Connection connection) {
         Select select = buildSelect()
             .where(where -> {
-                where.equal("${f.columnName()}", in);
+                where.in("${f.columnName()}", in);
             });
 
         BuildContext context = new BuildContext();
@@ -78,7 +78,6 @@ public abstract class ${simpleName} {
 
     </#list>
     // -----------------------------------------------------------------------------------------------------------------
-
     protected Select buildSelect() {
         return Select.build()
         <#list recordModel.fields() as f>
@@ -87,6 +86,18 @@ public abstract class ${simpleName} {
             .from("${recordModel.table().name()}");
     }
 
+    @jakarta.annotation.Nullable
+    protected ${recordModel.simpleName()} extractOne(List<${recordModel.simpleName()}> records) {
+        if (records.isEmpty()) {
+            return null;
+        } else if (records.size() == 1) {
+            return records.getFirst();
+        } else {
+            throw new IllegalStateException("More then one ${recordModel.simpleName()} record");
+        }
+    }
+
+    // fetch -----------------------------------------------------------------------------------------------------------
     @jakarta.annotation.Nullable
     protected ${recordModel.simpleName()} fetchOne(Select select, Connection connection) {
         BuildContext context = new BuildContext();
@@ -242,4 +253,11 @@ public abstract class ${simpleName} {
             throw new RuntimeException(e);
         }
     }
+
+    // connection ------------------------------------------------------------------------------------------------------
+    protected Connection getConnection() {
+        return connectionProvider.getConnection("${database.id()}");
+    }
+
+    // -----------------------------------------------------------------------------------------------------------------
 }

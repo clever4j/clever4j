@@ -1,4 +1,4 @@
-package com.clever4j.rdbgenerator.codegenerator;
+package com.clever4j.rdbgenerator.generators;
 
 import com.clever4j.lang.AllNonnullByDefault;
 import com.clever4j.rdbgenerator.codemodel.*;

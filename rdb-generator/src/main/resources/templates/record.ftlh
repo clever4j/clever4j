@@ -8,11 +8,15 @@ import jakarta.persistence.Column;
 <#list database.recordAnnotations() as a>@${a}</#list>
 @Table(name = "${table.name()}")
 public record ${simpleName}(
-
 <#list fields as field>
+
     <#if field.primaryKey>@Id</#if>
     <#if field.nullable>@Nullable<#else>@Nonnull</#if>
     @Column(name = "${field.name()}")
     ${field.type.getCanonicalName()} ${field.name}<#if field?has_next>,</#if>
 </#list>
-) {}
+) {
+<#list fields as f>
+    public static final String _${f.name()} = "${f.columnName()}";
+</#list>
+}

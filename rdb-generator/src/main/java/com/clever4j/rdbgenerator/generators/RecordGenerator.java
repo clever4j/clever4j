@@ -1,10 +1,9 @@
-package com.clever4j.rdbgenerator.codegenerator;
+package com.clever4j.rdbgenerator.generators;
 
 import com.clever4j.lang.AllNonnullByDefault;
 import com.clever4j.rdbgenerator.codemodel.RecordModel;
 import com.clever4j.rdbgenerator.freemarker.TemplateProcessor;
 
-import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.Map;
 

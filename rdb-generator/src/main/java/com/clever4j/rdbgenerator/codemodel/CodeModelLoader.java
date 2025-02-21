@@ -157,6 +157,10 @@ public final class CodeModelLoader {
     }
 
     private boolean isTableExcluded(String tableName) {
+        if (database.onlyTables() != null) {
+            return !database.onlyTables().contains(tableName);
+        }
+
         return database.excludeTables().contains(tableName);
     }
 

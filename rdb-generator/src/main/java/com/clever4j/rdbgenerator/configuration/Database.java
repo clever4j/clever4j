@@ -1,6 +1,7 @@
 package com.clever4j.rdbgenerator.configuration;
 
 import com.clever4j.lang.AllNonnullByDefault;
+import jakarta.annotation.Nullable;
 
 import java.nio.file.Path;
 import java.util.List;
@@ -13,6 +14,9 @@ public record Database(
     String dbPassword,
 
     List<String> excludeTables,
+
+    @Nullable
+    List<String> onlyTables,
 
     String packageName,
     Path output,

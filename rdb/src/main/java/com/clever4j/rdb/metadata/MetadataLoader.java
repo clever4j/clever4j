@@ -33,11 +33,6 @@ public final class MetadataLoader {
 
         while (resultSet.next()) {
             String tableName = resultSet.getString("TABLE_NAME");
-
-            if (!tableName.equals("user")) {
-                continue;
-            }
-
             List<ColumnMetadata> columns = getColumns(tableName, metaData);
 
             tableMetadata.add(new TableMetadata(tableName, Engine.POSTGRESQL, Collections.unmodifiableList(columns)));

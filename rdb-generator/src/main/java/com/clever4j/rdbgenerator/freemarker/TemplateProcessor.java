@@ -36,7 +36,7 @@ public final class TemplateProcessor {
     }
 
     public void processBaseDaoTemplate(Map<String, Object> model, String target) {
-        process(model, "base-dao.ftlh", target);
+        process(model, "dao-template.ftlh", target);
     }
 
     public void processDaoTemplate(Map<String, Object> model, String target) {

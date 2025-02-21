@@ -7,7 +7,7 @@ import com.clever4j.rdbgenerator.codemodel.CodeModelLoader;
 import com.clever4j.rdbgenerator.configuration.Configuration;
 import com.clever4j.rdbgenerator.configuration.Database;
 import com.clever4j.rdbgenerator.freemarker.TemplateProcessor;
-import com.clever4j.rdbgenerator.codegenerator.DatabaseGenerator;
+import com.clever4j.rdbgenerator.generators.DatabaseGenerator;
 import com.clever4j.rdbgenerator.services.Services;
 import picocli.CommandLine;
 import picocli.CommandLine.Command;
