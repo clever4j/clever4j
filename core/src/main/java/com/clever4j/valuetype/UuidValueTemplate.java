@@ -58,6 +58,10 @@ public abstract class UuidValueTemplate<T extends UuidValueTemplate<T>> implemen
         return Objects.equals(value, object);
     }
 
+    public boolean equals(String value) {
+        return Objects.equals(this.value, UUID.fromString(value));
+    }
+
     @Nullable
     @Override
     public String serializeToString() {

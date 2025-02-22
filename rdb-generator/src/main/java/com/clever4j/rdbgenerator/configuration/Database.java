@@ -23,7 +23,6 @@ public record Database(
 
     List<String> recordAnnotations,
     List<String> daoAnnotations,
-    List<String> baseImplementationDaoAnnotations,
     List<String> implementationDaoAnnotations
 ) {
 

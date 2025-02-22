@@ -20,6 +20,10 @@ public interface ${simpleName} {
     @jakarta.annotation.Nullable
     ${recordModel.simpleName()} getById(<#list recordModel.primaryKeys() as f>${f.type().getName()} ${f.name()}<#if f?has_next>, </#if></#list>, Connection connection);
 
+    ${recordModel.simpleName()} requireById(<#list recordModel.primaryKeys() as f>${f.type().getName()} ${f.name()}<#if f?has_next>, </#if></#list>);
+
+    ${recordModel.simpleName()} requireById(<#list recordModel.primaryKeys() as f>${f.type().getName()} ${f.name()}<#if f?has_next>, </#if></#list>, Connection connection);
+
     // INSERT ----------------------------------------------------------------------------------------------------------
     void insert(${recordModel.simpleName()} record);
 

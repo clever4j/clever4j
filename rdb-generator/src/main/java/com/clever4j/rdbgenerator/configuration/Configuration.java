@@ -48,11 +48,7 @@ public class Configuration {
                 readPath(database.output(), "repository.%s.output is required".formatted(id)),
 
                 readStringList(database.recordAnnotations(), false, ""),
-
                 readStringList(database.daoAnnotations(), false, ""),
-
-                readStringList(database.baseImplementationDaoAnnotations(), false, ""),
-
                 readStringList(database.implementationDaoAnnotations(), false, "")
             ));
         }

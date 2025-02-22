@@ -49,8 +49,11 @@ public final class CodeModelLoader {
             List<RecordFieldModel> fieldModels = new ArrayList<>();
 
             for (ColumnMetadata column : table.columns()) {
+                Class<?> type = typeMapper.map(column.type());
+
                 fieldModels.add(new RecordFieldModel(
-                    typeMapper.map(column.type()),
+                    type,
+                    type.getCanonicalName(),
                     objectNameProvider.getFieldName(column.name()),
                     objectNameProvider.formatPascalCase(column.name()),
                     objectNameProvider.getByInName(column.name()),

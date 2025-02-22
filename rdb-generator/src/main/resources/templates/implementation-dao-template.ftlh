@@ -62,6 +62,20 @@ public abstract class ${simpleName} {
         return fetchOne(sql, context, connection);
     }
 
+    public ${recordModel.simpleName()} requireById(<#list recordModel.primaryKeys() as f>${f.type().getName()} ${f.name()}<#if f?has_next>,</#if></#list>) {
+        return requireById(<#list recordModel.primaryKeys() as f>${f.name()}<#if f?has_next>, </#if></#list>, connectionProvider.getConnection("${database.id()}"));
+    }
+
+    public ${recordModel.simpleName()} requireById(<#list recordModel.primaryKeys() as f>${f.type().getName()} ${f.name()}<#if f?has_next>,</#if></#list>, Connection connection) {
+        ${recordModel.simpleName()} record = getById(<#list recordModel.primaryKeys() as f>${f.name()}<#if f?has_next>, </#if></#list>, connection);
+
+        if (record == null) {
+            throw new IllegalStateException("${recordModel.simpleName()} with id <#list recordModel.primaryKeys() as f>%s<#if f?has_next>, </#if></#list>.".formatted(<#list recordModel.primaryKeys() as f>${f.name()}<#if f?has_next>, </#if></#list>));
+        }
+
+        return record;
+    }
+
     // getByIn ---------------------------------------------------------------------------------------------------------
     <#list recordModel.fields() as f>
     protected List<${recordModel.simpleName()}> getBy${f.pascalName()}In(List<${f.type().getName()}> in, Connection connection) {

@@ -5,6 +5,7 @@ import com.clever4j.lang.AllNonnullByDefault;
 @AllNonnullByDefault
 public record RecordFieldModel(
     Class<?> type,
+    String canonicalNameType,
     String name,
     String pascalName,
     String getByInName,

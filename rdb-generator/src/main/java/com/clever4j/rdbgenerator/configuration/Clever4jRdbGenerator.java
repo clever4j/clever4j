@@ -37,7 +37,7 @@ public record Clever4jRdbGenerator(
         @JsonProperty("output")
         String output,
 
-        // recordModel ------------------------------------------------------------------------------------------------------
+        // record ------------------------------------------------------------------------------------------------------
         @JsonProperty("record-package-name")
         String recordPackageName,
 
@@ -46,13 +46,6 @@ public record Clever4jRdbGenerator(
 
         @JsonProperty("record-annotations")
         List<String> recordAnnotations,
-
-        // base-dao ----------------------------------------------------------------------------------------------------
-        @JsonProperty("base-dao-package-name")
-        String baseDaoPackageName,
-
-        @JsonProperty("base-dao-output")
-        String baseDaoOutput,
 
         // dao ---------------------------------------------------------------------------------------------------------
         @JsonProperty("dao-package-name")
@@ -63,16 +56,6 @@ public record Clever4jRdbGenerator(
 
         @JsonProperty("dao-annotations")
         List<String> daoAnnotations,
-
-        // base-implementation-dao -------------------------------------------------------------------------------------
-        @JsonProperty("base-implementation-dao-package-name")
-        String baseImplementationDaoPackageName,
-
-        @JsonProperty("base-implementation-dao-output")
-        String baseImplementationDaoOutput,
-
-        @JsonProperty("base-implementation-dao-annotations")
-        List<String> baseImplementationDaoAnnotations,
 
         // implementation-dao ------------------------------------------------------------------------------------------
         @JsonProperty("implementation-dao-package-name")
