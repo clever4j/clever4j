@@ -82,4 +82,19 @@ public final class Select implements Expression {
 
         return orderBy;
     }
+
+    public Select orderBy(OrderBy.OrderByConfigurer configurer) {
+        if (orderBy == null) {
+            this.orderBy = new OrderBy();
+        }
+
+        configurer.configure(orderBy);
+
+        return this;
+    }
+
+    public Select orderBy(OrderBy orderBy) {
+        this.orderBy = orderBy;
+        return this;
+    }
 }

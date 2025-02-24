@@ -18,6 +18,16 @@ public final class OrderBy implements Expression {
         return new OrderBy();
     }
 
+    public static OrderBy build(String identifier, OrderDirection direction) {
+        return OrderBy.build()
+            .rule(identifier, direction);
+    }
+
+    public static OrderBy build(String identifier) {
+        return OrderBy.build()
+            .rule(identifier, OrderDirection.ASC);
+    }
+
     public OrderBy rule(String identifier, OrderDirection direction) {
         orderRules.add(new OrderRule(Identifier.of(identifier), direction));
         return this;
@@ -25,6 +35,10 @@ public final class OrderBy implements Expression {
 
     public enum OrderDirection {
         ASC, DESC
+    }
+
+    public interface OrderByConfigurer {
+        void configure(OrderBy orderBy);
     }
 
     record OrderRule(

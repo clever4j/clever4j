@@ -1,5 +1,5 @@
 <#ftl output_format='plainText'>
-package ${packageName};
+package ${implementationDaoTemplate.packageName};
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -14,45 +14,59 @@ import com.clever4j.rdb.sql.Insert;
 import com.clever4j.rdb.sql.Delete;
 import com.clever4j.rdb.sql.Update;
 import com.clever4j.rdb.sql.Select;
+import com.clever4j.rdb.sql.OrderBy;
 import com.clever4j.rdb.sql.PostgreSqlBuilder;
-import ${recordModel.name()};
+import java.util.NoSuchElementException;
+
+import ${record.name()};
 
 @SuppressWarnings({"DataFlowIssue", "unused", "DuplicatedCode", "SqlSourceToSinkFlow"})
-public abstract class ${simpleName} {
+public abstract class ${implementationDaoTemplate.simpleName} {
 
     protected final ConnectionProvider connectionProvider;
     protected final PostgreSqlBuilder builder = new PostgreSqlBuilder();
 
-    public ${simpleName}(ConnectionProvider connectionProvider) {
+    public ${implementationDaoTemplate.simpleName}(ConnectionProvider connectionProvider) {
         this.connectionProvider = connectionProvider;
     }
 
-    public List<${recordModel.simpleName()}> getAll() {
+    public List<${record.simpleName()}> getAll() {
         return getAll(connectionProvider.getConnection("${database.id()}"));
     }
 
-    public List<${recordModel.simpleName()}> getAll(Connection connection) {
-        Select select = Select.build()
-        <#list recordModel.fields() as f>
-            .column("${f.columnName()}")
-        </#list>
-            .from("${recordModel.table().name()}");
+    public List<${record.simpleName()}> getAll(Connection connection) {
+        Select select = buildSelect();
 
         BuildContext context = new BuildContext();
         String sql = builder.build(select, context);
         return fetch(sql, context, connection);
     }
 
+    // getAll ordered --------------------------------------------------------------------------------------------------
+    public List<${record.simpleName()}> getAll(OrderBy orderBy) {
+        return getAll(connectionProvider.getConnection("${database.id()}"));
+    }
+
+    public List<${record.simpleName()}> getAll(OrderBy orderBy, Connection connection) {
+        Select select = buildSelect()
+            .orderBy(orderBy);
+
+        BuildContext context = new BuildContext();
+        String sql = builder.build(select, context);
+        return fetch(sql, context, connection);
+    }
+
+    // getById ---------------------------------------------------------------------------------------------------------
     @jakarta.annotation.Nullable
-    public ${recordModel.simpleName()} getById(<#list recordModel.primaryKeys() as f>${f.type().getName()} ${f.name()}<#if f?has_next>,</#if></#list>) {
-        return getById(<#list recordModel.primaryKeys() as f>${f.name()}<#if f?has_next>, </#if></#list>, connectionProvider.getConnection("${database.id()}"));
+    public ${record.simpleName()} getById(<#list record.primaryKeys() as f>${f.type().getName()} ${f.name()}<#if f?has_next>,</#if></#list>) {
+        return getById(<#list record.primaryKeys() as f>${f.name()}<#if f?has_next>, </#if></#list>, connectionProvider.getConnection("${database.id()}"));
     }
 
     @jakarta.annotation.Nullable
-    public ${recordModel.simpleName()} getById(<#list recordModel.primaryKeys() as f>${f.type().getName()} ${f.name()}<#if f?has_next>,</#if></#list>, Connection connection) {
+    public ${record.simpleName()} getById(<#list record.primaryKeys() as f>${f.type().getName()} ${f.name()}<#if f?has_next>,</#if></#list>, Connection connection) {
         Select select = buildSelect()
             .where(where -> {
-            <#list recordModel.primaryKeys() as f>
+            <#list record.primaryKeys() as f>
                 where.equal("${f.columnName()}", ${f.name()});
             </#list>
             });
@@ -62,27 +76,29 @@ public abstract class ${simpleName} {
         return fetchOne(sql, context, connection);
     }
 
-    public ${recordModel.simpleName()} requireById(<#list recordModel.primaryKeys() as f>${f.type().getName()} ${f.name()}<#if f?has_next>,</#if></#list>) {
-        return requireById(<#list recordModel.primaryKeys() as f>${f.name()}<#if f?has_next>, </#if></#list>, connectionProvider.getConnection("${database.id()}"));
+    // requireById -----------------------------------------------------------------------------------------------------
+    public ${record.simpleName()} requireById(<#list record.primaryKeys() as f>${f.type().getName()} ${f.name()}<#if f?has_next>,</#if></#list>) {
+        return requireById(<#list record.primaryKeys() as f>${f.name()}<#if f?has_next>, </#if></#list>, connectionProvider.getConnection("${database.id()}"));
     }
 
-    public ${recordModel.simpleName()} requireById(<#list recordModel.primaryKeys() as f>${f.type().getName()} ${f.name()}<#if f?has_next>,</#if></#list>, Connection connection) {
-        ${recordModel.simpleName()} record = getById(<#list recordModel.primaryKeys() as f>${f.name()}<#if f?has_next>, </#if></#list>, connection);
+    public ${record.simpleName()} requireById(<#list record.primaryKeys() as f>${f.type().getName()} ${f.name()}<#if f?has_next>,</#if></#list>, Connection connection) {
+        ${record.simpleName()} record = getById(<#list record.primaryKeys() as f>${f.name()}<#if f?has_next>, </#if></#list>, connection);
 
         if (record == null) {
-            throw new IllegalStateException("${recordModel.simpleName()} with id <#list recordModel.primaryKeys() as f>%s<#if f?has_next>, </#if></#list>.".formatted(<#list recordModel.primaryKeys() as f>${f.name()}<#if f?has_next>, </#if></#list>));
+            throw new NoSuchElementException("${record.simpleName()} with id <#list record.primaryKeys() as f>%s<#if f?has_next>, </#if></#list>.".formatted(<#list record.primaryKeys() as f>${f.name()}<#if f?has_next>, </#if></#list>));
         }
 
         return record;
     }
 
     // getByIn ---------------------------------------------------------------------------------------------------------
-    <#list recordModel.fields() as f>
-    protected List<${recordModel.simpleName()}> getBy${f.pascalName()}In(List<${f.type().getName()}> in, Connection connection) {
+    <#list record.fields() as f>
+    protected List<${record.simpleName()}> getBy${f.pascalName()}In(List<${f.type().getName()}> in, OrderBy orderBy, Connection connection) {
         Select select = buildSelect()
             .where(where -> {
                 where.in("${f.columnName()}", in);
-            });
+            })
+            .orderBy(orderBy);
 
         BuildContext context = new BuildContext();
         String sql = builder.build(select, context);
@@ -94,52 +110,52 @@ public abstract class ${simpleName} {
     // -----------------------------------------------------------------------------------------------------------------
     protected Select buildSelect() {
         return Select.build()
-        <#list recordModel.fields() as f>
+        <#list record.fields() as f>
             .column("${f.columnName()}")
         </#list>
-            .from("${recordModel.table().name()}");
+            .from("${record.table().name()}");
     }
 
     @jakarta.annotation.Nullable
-    protected ${recordModel.simpleName()} extractOne(List<${recordModel.simpleName()}> records) {
+    protected ${record.simpleName()} extractOne(List<${record.simpleName()}> records) {
         if (records.isEmpty()) {
             return null;
         } else if (records.size() == 1) {
             return records.getFirst();
         } else {
-            throw new IllegalStateException("More then one ${recordModel.simpleName()} record");
+            throw new IllegalStateException("More then one ${record.simpleName()} record");
         }
     }
 
     // fetch -----------------------------------------------------------------------------------------------------------
     @jakarta.annotation.Nullable
-    protected ${recordModel.simpleName()} fetchOne(Select select, Connection connection) {
+    protected ${record.simpleName()} fetchOne(Select select, Connection connection) {
         BuildContext context = new BuildContext();
         String sql = builder.build(select, context);
         return fetchOne(sql, context, connection);
     }
 
     @jakarta.annotation.Nullable
-    protected ${recordModel.simpleName()} fetchOne(String query, BuildContext context, Connection connection) {
-        List<${recordModel.simpleName()}> result = fetch(query, context, connection);
+    protected ${record.simpleName()} fetchOne(String query, BuildContext context, Connection connection) {
+        List<${record.simpleName()}> result = fetch(query, context, connection);
 
         if (result.isEmpty()) {
             return null;
         } else if (result.size() == 1) {
             return result.getFirst();
         } else {
-            throw new IllegalStateException("More then one ${recordModel.simpleName()} record");
+            throw new NoSuchElementException("More then one ${record.simpleName()} record");
         }
     }
 
-    protected List<${recordModel.simpleName()}> fetch(Select select, Connection connection) {
+    protected List<${record.simpleName()}> fetch(Select select, Connection connection) {
         BuildContext context = new BuildContext();
         String sql = builder.build(select, context);
         return fetch(sql, context, connection);
     }
 
-    protected List<${recordModel.simpleName()}> fetch(String query, BuildContext context, Connection connection) {
-        List<${recordModel.simpleName()}> result = new ArrayList<>();
+    protected List<${record.simpleName()}> fetch(String query, BuildContext context, Connection connection) {
+        List<${record.simpleName()}> result = new ArrayList<>();
 
         try (PreparedStatement statement = connection.prepareStatement(query)) {
             context.prepareStatement(statement);
@@ -147,8 +163,8 @@ public abstract class ${simpleName} {
             ResultSet resultSet = statement.executeQuery();
 
             while (resultSet.next()) {
-                result.add(new ${recordModel.simpleName()} (
-                <#list recordModel.fields() as field>
+                result.add(new ${record.simpleName()} (
+                <#list record.fields() as field>
                     ${generateCreateJavaType(field)}<#if field?has_next>,</#if>
                 </#list>
                 ));
@@ -160,10 +176,10 @@ public abstract class ${simpleName} {
         }
     }
 
-    private ${recordModel.simpleName()} mapResultSet(ResultSet resultSet) {
+    private ${record.simpleName()} mapResultSet(ResultSet resultSet) {
         try {
-            return new ${recordModel.simpleName()} (
-            <#list recordModel.fields() as field>
+            return new ${record.simpleName()} (
+            <#list record.fields() as field>
                 ${generateCreateJavaType(field)}<#if field?has_next>,</#if>
             </#list>
             );
@@ -173,14 +189,14 @@ public abstract class ${simpleName} {
     }
 
     // INSERT ----------------------------------------------------------------------------------------------------------
-    public void insert(${recordModel.simpleName()} record) {
+    public void insert(${record.simpleName()} record) {
         insert(record, connectionProvider.getConnection("${database.id()}"));
     }
 
-    public void insert(${recordModel.simpleName()} record, Connection connection) {
+    public void insert(${record.simpleName()} record, Connection connection) {
         Insert insert = Insert.build()
-            .into("${recordModel.table().name()}")
-            <#list recordModel.fields() as f>
+            .into("${record.table().name()}")
+            <#list record.fields() as f>
             .value("${f.columnName()}", record.${f.name()}())
             </#list>
         ;
@@ -196,16 +212,16 @@ public abstract class ${simpleName} {
         }
     }
 
-    // DELETE ----------------------------------------------------------------------------------------------------------
-    public void delete(<#list recordModel.primaryKeys() as f>${f.type().getName()} ${f.name()}<#if f?has_next>,</#if></#list>) {
-        delete(<#list recordModel.primaryKeys() as f>${f.name()}<#if f?has_next>,</#if></#list>, connectionProvider.getConnection("${database.id()}"));
+    // delete ----------------------------------------------------------------------------------------------------------
+    public void delete(<#list record.primaryKeys() as f>${f.type().getName()} ${f.name()}<#if f?has_next>,</#if></#list>) {
+        delete(<#list record.primaryKeys() as f>${f.name()}<#if f?has_next>,</#if></#list>, connectionProvider.getConnection("${database.id()}"));
     }
 
-    public void delete(<#list recordModel.primaryKeys() as f>${f.type().getName()} ${f.name()}<#if f?has_next>,</#if></#list>, Connection connection) {
+    public void delete(<#list record.primaryKeys() as f>${f.type().getName()} ${f.name()}<#if f?has_next>,</#if></#list>, Connection connection) {
         Delete delete = Delete.build()
-            .table("${recordModel.table().name()}")
+            .table("${record.table().name()}")
             .where(where -> {
-            <#list recordModel.primaryKeys() as f>
+            <#list record.primaryKeys() as f>
                 where.equal("${f.columnName()}", ${f.name()});
             </#list>
             });
@@ -221,13 +237,14 @@ public abstract class ${simpleName} {
         }
     }
 
+    // deleteAll -------------------------------------------------------------------------------------------------------
     public void deleteAll() {
         deleteAll(connectionProvider.getConnection("${database.id()}"));
     }
 
     public void deleteAll(Connection connection) {
         Delete delete = Delete.build()
-            .table("${recordModel.table().name()}");
+            .table("${record.table().name()}");
 
         BuildContext context = new BuildContext();
         String sql = builder.build(delete, context);
@@ -240,19 +257,38 @@ public abstract class ${simpleName} {
         }
     }
 
-    // UPDATE ----------------------------------------------------------------------------------------------------------
-    public void update(<#list recordModel.primaryKeys() as f>${f.type().getName()} ${f.name()}<#if f?has_next>,</#if></#list>, ${recordModel.simpleName()} record) {
-        update(<#list recordModel.primaryKeys() as f>${f.name()}<#if f?has_next>, </#if></#list>, record, connectionProvider.getConnection("${database.id()}"));
+    // deleteById ------------------------------------------------------------------------------------------------------
+    <#list record.fields() as f>
+    protected void deleteBy${f.pascalName()}In(List<${f.canonicalNameType}> in, Connection connection) {
+        Delete delete = Delete.build()
+            .table("${record.table.name}");
+
+        BuildContext context = new BuildContext();
+        String sql = builder.build(delete, context);
+
+        try (PreparedStatement statement = connection.prepareStatement(sql)) {
+            context.prepareStatement(statement);
+            statement.execute();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
     }
 
-    public void update(<#list recordModel.primaryKeys() as f>${f.type().getName()} ${f.name()}<#if f?has_next>,</#if></#list>, ${recordModel.simpleName()} record, Connection connection) {
+    </#list>
+
+    // update ----------------------------------------------------------------------------------------------------------
+    public void update(<#list record.primaryKeys() as f>${f.type().getName()} ${f.name()}<#if f?has_next>,</#if></#list>, ${record.simpleName()} record) {
+        update(<#list record.primaryKeys() as f>${f.name()}<#if f?has_next>, </#if></#list>, record, connectionProvider.getConnection("${database.id()}"));
+    }
+
+    public void update(<#list record.primaryKeys() as f>${f.type().getName()} ${f.name()}<#if f?has_next>,</#if></#list>, ${record.simpleName()} record, Connection connection) {
         Update update = Update.build()
-            .table("${recordModel.table().name()}")
-            <#list recordModel.fields() as f>
+            .table("${record.table().name()}")
+            <#list record.fields() as f>
             .set("${f.columnName()}", record.${f.name()}())
             </#list>
             .where(where -> {
-            <#list recordModel.primaryKeys() as f>
+            <#list record.primaryKeys() as f>
                 where.equal("${f.columnName()}", ${f.name()});
             </#list>
             });

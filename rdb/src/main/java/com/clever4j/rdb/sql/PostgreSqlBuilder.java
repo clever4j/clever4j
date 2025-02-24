@@ -207,6 +207,14 @@ public final class PostgreSqlBuilder implements SqlBuilder {
 
             if (condition.operator().equals(RelationOperator.EQUAL)) {
                 query.append(" = ");
+            } else if (condition.operator().equals(RelationOperator.GT)) {
+                query.append(" > ");
+            } else if (condition.operator().equals(RelationOperator.GTE)) {
+                query.append(" >= ");
+            } else if (condition.operator().equals(RelationOperator.LT)) {
+                query.append(" < ");
+            } else if (condition.operator().equals(RelationOperator.LTE)) {
+                query.append(" <= ");
             } else if (condition.operator().equals(RelationOperator.IN)) {
                 query.append(" IN ");
             }

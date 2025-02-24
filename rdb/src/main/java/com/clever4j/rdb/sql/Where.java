@@ -25,6 +25,26 @@ public final class Where implements Expression {
         return this;
     }
 
+    public Where gt(String identifier, Object value) {
+        conditions.add(new Condition(Identifier.of(identifier), RelationOperator.GT, new ValueExpression(value)));
+        return this;
+    }
+
+    public Where gte(String identifier, Object value) {
+        conditions.add(new Condition(Identifier.of(identifier), RelationOperator.GTE, new ValueExpression(value)));
+        return this;
+    }
+
+    public Where lt(String identifier, Object value) {
+        conditions.add(new Condition(Identifier.of(identifier), RelationOperator.LT, new ValueExpression(value)));
+        return this;
+    }
+
+    public Where lte(String identifier, Object value) {
+        conditions.add(new Condition(Identifier.of(identifier), RelationOperator.LTE, new ValueExpression(value)));
+        return this;
+    }
+
     record Condition(
         Expression left,
         RelationOperator operator,

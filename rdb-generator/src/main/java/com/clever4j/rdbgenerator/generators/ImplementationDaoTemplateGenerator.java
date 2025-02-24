@@ -28,15 +28,11 @@ public class ImplementationDaoTemplateGenerator {
     public void generate() {
         Map<String, Object> model = new HashMap<>();
 
-        model.put("name", implementationDaoTemplateModel.name());
-        model.put("packageName", implementationDaoTemplateModel.packageName());
-        model.put("simpleName", implementationDaoTemplateModel.simpleName());
+        model.put("implementationDaoTemplate", implementationDaoTemplateModel);
         model.put("database", implementationDaoTemplateModel.database());
-        model.put("recordModel", implementationDaoTemplateModel.recordModel());
-        model.put("baseDaoModel", implementationDaoTemplateModel.daoTemplateModel());
-        model.put("daoModel", implementationDaoTemplateModel.daoModel());
+        model.put("record", implementationDaoTemplateModel.recordModel());
 
-        // // functions
+        // functions
         model.put("generateCreateJavaType", new GenerateCreateJavaType());
         model.put("setStatementObject", new SetStatementObject());
 
