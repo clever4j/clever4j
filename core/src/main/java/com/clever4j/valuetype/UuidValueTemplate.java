@@ -44,6 +44,10 @@ public abstract class UuidValueTemplate<T extends UuidValueTemplate<T>> implemen
         return value;
     }
 
+    public String requireString() {
+        return requireNonNull(value).toString();
+    }
+
     @Override
     public int compareTo(T value) {
         return STRING_COMPARATOR.compare(this.value, value.getValue());

@@ -16,6 +16,14 @@ public final class MimeTypeValue extends MimeTypeValueTemplate<MimeTypeValue> {
         super(value);
     }
 
+    public static MimeTypeValue of(@Nullable String value) {
+        if (value == null) {
+            return NULL_INSTANCE;
+        } else {
+            return INSTANCES.computeIfAbsent(MimeType.valueOf(value), MimeTypeValue::new);
+        }
+    }
+
     public static MimeTypeValue of(@Nullable MimeType value) {
         if (value == null) {
             return NULL_INSTANCE;

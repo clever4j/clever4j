@@ -11,6 +11,7 @@ import java.util.Objects;
 public abstract class MimeTypeValueTemplate<T extends MimeTypeValueTemplate<T>> implements Comparable<T> {
 
     private final static Comparator<String> STRING_COMPARATOR = Comparator.nullsLast(String::compareTo);
+
     @Nullable
     private final MimeType value;
 
@@ -26,6 +27,14 @@ public abstract class MimeTypeValueTemplate<T extends MimeTypeValueTemplate<T>> 
         }
 
         return value;
+    }
+
+    public String requireString() {
+        if (value == null) {
+            throw new IllegalStateException("value not set");
+        }
+
+        return value.name();
     }
 
     @Nullable
