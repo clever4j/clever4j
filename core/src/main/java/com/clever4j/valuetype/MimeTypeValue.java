@@ -10,21 +10,13 @@ import java.util.concurrent.ConcurrentHashMap;
 public final class MimeTypeValue extends MimeTypeValueTemplate<MimeTypeValue> {
 
     private static final MimeTypeValue NULL_INSTANCE = new MimeTypeValue(null);
-    private static final Map<MimeType, MimeTypeValue> INSTANCES = new ConcurrentHashMap<>();
+    private static final Map<String, MimeTypeValue> INSTANCES = new ConcurrentHashMap<>();
 
-    private MimeTypeValue(@Nullable MimeType value) {
+    private MimeTypeValue(@Nullable String value) {
         super(value);
     }
 
     public static MimeTypeValue of(@Nullable String value) {
-        if (value == null) {
-            return NULL_INSTANCE;
-        } else {
-            return INSTANCES.computeIfAbsent(MimeType.valueOf(value), MimeTypeValue::new);
-        }
-    }
-
-    public static MimeTypeValue of(@Nullable MimeType value) {
         if (value == null) {
             return NULL_INSTANCE;
         } else {
@@ -33,7 +25,7 @@ public final class MimeTypeValue extends MimeTypeValueTemplate<MimeTypeValue> {
     }
 
     @Override
-    protected MimeTypeValue createObject(@Nullable MimeType value) {
+    protected MimeTypeValue createObject(@Nullable String value) {
         return of(value);
     }
 }

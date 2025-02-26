@@ -13,15 +13,15 @@ public abstract class MimeTypeValueTemplate<T extends MimeTypeValueTemplate<T>> 
     private final static Comparator<String> STRING_COMPARATOR = Comparator.nullsLast(String::compareTo);
 
     @Nullable
-    private final MimeType value;
+    private final String value;
 
-    protected MimeTypeValueTemplate(@Nullable MimeType value) {
+    protected MimeTypeValueTemplate(@Nullable String value) {
         this.value = value;
     }
 
-    protected abstract T createObject(@Nullable MimeType value);
+    protected abstract T createObject(@Nullable String value);
 
-    public MimeType requireValue() {
+    public String requireValue() {
         if (value == null) {
             throw new IllegalStateException("value not set");
         }
@@ -34,24 +34,21 @@ public abstract class MimeTypeValueTemplate<T extends MimeTypeValueTemplate<T>> 
             throw new IllegalStateException("value not set");
         }
 
-        return value.name();
-    }
-
-    @Nullable
-    public MimeType getValue() {
         return value;
     }
 
-    public MimeType getValueOrDefault(MimeType defaultValue) {
+    @Nullable
+    public String getValue() {
+        return value;
+    }
+
+    public String getValueOrDefault(String defaultValue) {
         return value == null ? defaultValue : value;
     }
 
     @Override
     public int compareTo(T value) {
-        return STRING_COMPARATOR.compare(
-            this.value == null ? null : this.value.name(),
-            value.getValue() == null ? null : value.getValue().name()
-        );
+        return STRING_COMPARATOR.compare(this.value, value.getValue());
     }
 
     @Nonnull
