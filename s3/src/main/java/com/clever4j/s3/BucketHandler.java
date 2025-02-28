@@ -25,11 +25,9 @@ public final class BucketHandler implements AutoCloseable {
     private final String region;
     private final String prefix;
     private final String delimiter;
-
+    private final Object clientMutex = new Object();
     @Nullable
     private S3Client client;
-
-    private final Object clientMutex = new Object();
 
     public BucketHandler(String bucket, String accessKeyId, String secretAccessKey, String region, String prefix, String delimiter) {
         this.bucket = bucket.strip();
@@ -275,6 +273,15 @@ public final class BucketHandler implements AutoCloseable {
     // }
 
     // get -------------------------------------------------------------------------------------------------------------
+    public InputStream getInputStream(String key) {
+        GetObjectRequest request = GetObjectRequest.builder()
+            .bucket(bucket)
+            .key(key)
+            .build();
+
+        return getClient().getObject(request);
+    }
+
     public InputStream getInputStream(BucketObject object) {
         GetObjectRequest request = GetObjectRequest.builder()
             .bucket(bucket)

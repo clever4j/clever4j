@@ -1,6 +1,7 @@
 package com.clever4j.valuetype;
 
 import com.clever4j.lang.AllNonnullByDefault;
+import com.clever4j.valuetype.serializable.StringSerializable;
 import jakarta.annotation.Nonnull;
 import jakarta.annotation.Nullable;
 
@@ -8,7 +9,7 @@ import java.util.Comparator;
 import java.util.Objects;
 
 @AllNonnullByDefault
-public abstract class MimeTypeValueTemplate<T extends MimeTypeValueTemplate<T>> implements Comparable<T> {
+public abstract class MimeTypeValueTemplate<T extends MimeTypeValueTemplate<T>> implements Comparable<T>, StringSerializable {
 
     private final static Comparator<String> STRING_COMPARATOR = Comparator.nullsLast(String::compareTo);
 
@@ -49,6 +50,12 @@ public abstract class MimeTypeValueTemplate<T extends MimeTypeValueTemplate<T>> 
     @Override
     public int compareTo(T value) {
         return STRING_COMPARATOR.compare(this.value, value.getValue());
+    }
+
+    @Nullable
+    @Override
+    public String serializeToString() {
+        return value;
     }
 
     @Nonnull
