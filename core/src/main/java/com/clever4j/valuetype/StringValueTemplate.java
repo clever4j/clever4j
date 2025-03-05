@@ -30,7 +30,7 @@ public abstract class StringValueTemplate<T extends StringValueTemplate<T>> impl
         }
 
         if (value != null && cleanNonAlphanumeric) {
-            value = value.replaceAll("[^A-Za-z0-9\\sáéíóúÁÉÍÓÚàèìòùÀÈÌÒÙäëïöüÄËÏÖÜâêîôûÂÊÎÔÛ]", "");
+            value = value.replaceAll("[^A-Za-z0-9\\sĘęĄąŚśŁłŻżŹźĆćŃńáéíóúÁÉÍÓÚàèìòùÀÈÌÒÙäëïöüÄËÏÖÜâêîôûÂÊÎÔÛ]", "");
         }
 
         this.value = value;
