@@ -41,6 +41,14 @@ public class LangUtil {
         }
     }
 
+    public static <T> T require(@Nullable T value, T defaultValue) {
+        if (value == null) {
+            return defaultValue;
+        } else {
+            return value;
+        }
+    }
+
     public static <T> T require(@Nullable T value, String message) {
         if (value == null) {
             throw new NoSuchElementException(message);
