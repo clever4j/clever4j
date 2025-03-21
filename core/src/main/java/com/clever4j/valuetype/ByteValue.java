@@ -7,7 +7,7 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 @AllNonnullByDefault
-public final class ByteValue extends LongValueTemplate<ByteValue> {
+public final class ByteValue extends ByteValueTemplate<ByteValue> {
 
     private static final ByteValue NULL_INSTANCE = new ByteValue(null);
     private static final Map<Long, ByteValue> INSTANCES = new ConcurrentHashMap<>();

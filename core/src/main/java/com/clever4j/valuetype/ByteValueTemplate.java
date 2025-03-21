@@ -1,95 +1,91 @@
 package com.clever4j.valuetype;
 
 import com.clever4j.lang.AllNonnullByDefault;
-import jakarta.annotation.Nonnull;
 
 import javax.annotation.Nullable;
-import java.util.Objects;
-
 @AllNonnullByDefault
-public abstract class ByteValueTemplate<T extends ByteValueTemplate<T>> implements Comparable<T> {
-
-    @Nullable
-    private final Long value;
+public abstract class ByteValueTemplate<T extends ByteValueTemplate<T>> extends LongValueTemplate<T> {
 
     protected ByteValueTemplate(@Nullable Long value) {
-        this.value = value;
-    }
-
-    @Nonnull
-    public static <T extends ByteValueTemplate<?>> T sum(ObjectFactory<T> objectFactory, T... values) {
-        long sum = 0;
-
-        for (T value : values) {
-            sum += value.requireValue();
-        }
-
-        return objectFactory.create(sum);
-    }
-
-    protected abstract T createObject(@Nullable Long value);
-
-    public Long requireValue() {
-        if (value == null) {
-            throw new IllegalStateException("value not set");
-        }
-
-        return value;
+        super(value);
     }
 
     @Nullable
-    public Long getValue() {
-        return value;
+    public Long getBytes() {
+        return getValue();
     }
 
-    public Long getValueOrDefault(Long defaultValue) {
-        return value == null ? defaultValue : value;
+    public Long getBytesOrDefault(long defaultValue) {
+        return getValueOrDefault(defaultValue);
     }
 
-    public Long getValueOrZero() {
-        return value == null ? 0 : value;
+    public Long getBytesOrZero() {
+        return getValueOrZero();
     }
 
-    @Override
-    public int compareTo(T time) {
-        return Long.compare(this.value, time.requireValue());
+    @Nullable
+    public Long getKilobytes() {
+        return convertUnit(1024L);
     }
 
-    @Nonnull
-    public T add(T value) {
-        return createObject(requireValue() + value.requireValue());
+    public Long getKilobytesOrDefault(long defaultValue) {
+        return convertUnitOrDefault(1024L, defaultValue);
     }
 
-    @Nonnull
-    public T multiple(T value) {
-        return createObject(requireValue() * value.requireValue());
+    public Long getKilobytesOrZero() {
+        return convertUnitOrZero(1024L);
     }
 
-    @Nonnull
-    public T multiple(Long value) {
-        return createObject(requireValue() * value);
+    @Nullable
+    public Long getMegabytes() {
+        return convertUnit(1024L * 1024);
     }
 
-    @Nonnull
-    @Override
-    public String toString() {
-        return String.valueOf(value);
+    public Long getMegabytesOrDefault(long defaultValue) {
+        return convertUnitOrDefault(1024L * 1024, defaultValue);
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        ByteValueTemplate<?> that = (ByteValueTemplate<?>) o;
-        return Objects.equals(value, that.value);
+    public Long getMegabytesOrZero() {
+        return convertUnitOrZero(1024L * 1024);
     }
 
-    @Override
-    public int hashCode() {
-        return Objects.hashCode(value);
+    @Nullable
+    public Long getGigabytes() {
+        return convertUnit(1024L * 1024 * 1024);
     }
 
-    protected interface ObjectFactory<T> {
-        T create(Long value);
+    public Long getGigabytesOrDefault(long defaultValue) {
+        return convertUnitOrDefault(1024L * 1024 * 1024, defaultValue);
+    }
+
+    public Long getGigabytesOrZero() {
+        return convertUnitOrZero(1024L * 1024 * 1024);
+    }
+
+    @Nullable
+    public Long getTerabytes() {
+        return convertUnit(1024L * 1024 * 1024 * 1024);
+    }
+
+    public Long getTerabytesOrDefault(long defaultValue) {
+        return convertUnitOrDefault(1024L * 1024 * 1024 * 1024, defaultValue);
+    }
+
+    public Long getTerabytesOrZero() {
+        return convertUnitOrZero(1024L * 1024 * 1024 * 1024);
+    }
+
+    @Nullable
+    private Long convertUnit(long factor) {
+        Long value = getValue();
+        return (value != null) ? value / factor : null;
+    }
+
+    private Long convertUnitOrDefault(long factor, long defaultValue) {
+        return getValueOrDefault(defaultValue) / factor;
+    }
+
+    private Long convertUnitOrZero(long factor) {
+        return getValueOrZero() / factor;
     }
 }

@@ -43,7 +43,7 @@ public abstract class LongValueTemplate<T extends LongValueTemplate<T>> implemen
         return value;
     }
 
-    public Long getValueOrDefault(Long defaultValue) {
+    public Long getValueOrDefault(long defaultValue) {
         return value == null ? defaultValue : value;
     }
 
