@@ -22,6 +22,30 @@ public class ListUtil {
         list.add(toIndex, remove);
     }
 
+    // get -------------------------------------------------------------------------------------------------------------
+    public static <T> T requireGet(List<T> values, Predicate<T> test) {
+        T result = get(values, test);
+
+        if (result == null) {
+            throw new NoSuchElementException("Element not found");
+        }
+
+        return result;
+    }
+
+    @Nullable
+    public static <T> T get(List<T> values, Predicate<T> test) {
+        for (T t : values) {
+            if (test.test(t)) {
+                return t;
+            }
+        }
+
+        throw new IllegalStateException("Element not found");
+    }
+
+    // list ------------------------------------------------------------------------------------------------------------
+
     public static <T> List<T> list() {
         return new ArrayList<>();
     }
