@@ -41,7 +41,7 @@ public class ListUtil {
             }
         }
 
-        throw new IllegalStateException("Element not found");
+        return null;
     }
 
     // list ------------------------------------------------------------------------------------------------------------
