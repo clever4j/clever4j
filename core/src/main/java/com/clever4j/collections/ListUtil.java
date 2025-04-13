@@ -44,6 +44,16 @@ public class ListUtil {
         return null;
     }
 
+    public static <T> boolean anyMatch(List<T> values, Predicate<T> test) {
+        for (T t : values) {
+            if (test.test(t)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
     // list ------------------------------------------------------------------------------------------------------------
 
     public static <T> List<T> list() {
@@ -51,7 +61,7 @@ public class ListUtil {
     }
 
     public static <T> List<T> list(T... values) {
-        return new ArrayList<>(Arrays.asList(values));
+        return List.of(values);
     }
 
     public static <T> List<T> list(List<T> values) {
