@@ -263,7 +263,7 @@ public abstract class ${implementationDaoTemplate.simpleName} {
         Delete delete = Delete.build()
             .table("${record.table.name}")
             .where(where -> {
-                where.in("${f.column.name}", in);
+                where.in("${f.columnName()}", in);
             });
 
         BuildContext context = new BuildContext();
