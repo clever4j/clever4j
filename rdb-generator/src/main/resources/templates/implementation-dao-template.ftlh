@@ -257,11 +257,14 @@ public abstract class ${implementationDaoTemplate.simpleName} {
         }
     }
 
-    // deleteById ------------------------------------------------------------------------------------------------------
+    // deleteBy --------------------------------------------------------------------------------------------------------
     <#list record.fields() as f>
     protected void deleteBy${f.pascalName()}In(List<${f.canonicalNameType}> in, Connection connection) {
         Delete delete = Delete.build()
-            .table("${record.table.name}");
+            .table("${record.table.name}")
+            .where(where -> {
+                where.in("${f.column.name}", in);
+            });
 
         BuildContext context = new BuildContext();
         String sql = builder.build(delete, context);
