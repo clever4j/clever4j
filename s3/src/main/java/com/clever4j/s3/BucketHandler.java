@@ -3,14 +3,19 @@ package com.clever4j.s3;
 import com.clever4j.lang.AllNonnullByDefault;
 import jakarta.annotation.Nullable;
 import software.amazon.awssdk.auth.credentials.AwsBasicCredentials;
+import software.amazon.awssdk.auth.credentials.DefaultCredentialsProvider;
 import software.amazon.awssdk.auth.credentials.StaticCredentialsProvider;
 import software.amazon.awssdk.core.sync.RequestBody;
 import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.model.*;
+import software.amazon.awssdk.services.s3.presigner.S3Presigner;
+import software.amazon.awssdk.services.s3.presigner.model.GetObjectPresignRequest;
 
 import java.io.InputStream;
+import java.net.URL;
 import java.nio.file.Path;
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -26,8 +31,12 @@ public final class BucketHandler implements AutoCloseable {
     private final String prefix;
     private final String delimiter;
     private final Object clientMutex = new Object();
+
     @Nullable
     private S3Client client;
+
+    @Nullable
+    private S3Presigner presigner;
 
     public BucketHandler(String bucket, String accessKeyId, String secretAccessKey, String region, String prefix, String delimiter) {
         this.bucket = bucket.strip();
@@ -58,6 +67,29 @@ public final class BucketHandler implements AutoCloseable {
         if (client != null) {
             client.close();
         }
+    }
+
+    private S3Presigner getPresigner() {
+        return S3Presigner.builder()
+            .region(Region.of(region))
+            .credentialsProvider(DefaultCredentialsProvider.create())
+            .build();
+    }
+
+    public URL getPresignedUrl(String key) {
+        GetObjectRequest getObjectRequest = GetObjectRequest.builder()
+            .bucket(bucket)
+            .key(key)
+            .build();
+
+        GetObjectPresignRequest presignRequest = GetObjectPresignRequest.builder()
+            .signatureDuration(Duration.ofMinutes(5))
+            .getObjectRequest(getObjectRequest)
+            .build();
+
+        return getPresigner()
+            .presignGetObject(presignRequest)
+            .url();
     }
 
     // private final String iamRole;
@@ -136,19 +168,20 @@ public final class BucketHandler implements AutoCloseable {
 //    }
 //
 //    private BucketObject createBucketObject(S3Object s3Object) {
-////
-////        String key = s3Object.key().replaceFirst(prefix, "");
-////
-////        PathTokenizer.PathParts pathParts = pathTokenizer.getPathParts(key);
-////
-////        return new BucketObject(
-////            S3ObjectKey.of(key),
-////            pathParts.parent(),
-////            pathParts.name(),
-////            pathParts.extension(),
-////            pathParts.fileName(),
-////            s3Object
-////        );
+
+    /// /
+    /// /        String key = s3Object.key().replaceFirst(prefix, "");
+    /// /
+    /// /        PathTokenizer.PathParts pathParts = pathTokenizer.getPathParts(key);
+    /// /
+    /// /        return new BucketObject(
+    /// /            S3ObjectKey.of(key),
+    /// /            pathParts.parent(),
+    /// /            pathParts.name(),
+    /// /            pathParts.extension(),
+    /// /            pathParts.fileName(),
+    /// /            s3Object
+    /// /        );
 //
 //        return null;
 //    }
