@@ -72,18 +72,22 @@ public final class BucketHandler implements AutoCloseable {
     private S3Presigner getPresigner() {
         return S3Presigner.builder()
             .region(Region.of(region))
-            .credentialsProvider(DefaultCredentialsProvider.create())
+            .credentialsProvider(
+                StaticCredentialsProvider.create(
+                    AwsBasicCredentials.create(accessKeyId, secretAccessKey)
+                )
+            )
             .build();
     }
 
-    public URL getPresignedUrl(String key) {
+    public URL getPresignedUrl(String key, Duration signatureDuration) {
         GetObjectRequest getObjectRequest = GetObjectRequest.builder()
             .bucket(bucket)
             .key(key)
             .build();
 
         GetObjectPresignRequest presignRequest = GetObjectPresignRequest.builder()
-            .signatureDuration(Duration.ofMinutes(5))
+            .signatureDuration(signatureDuration)
             .getObjectRequest(getObjectRequest)
             .build();
 
@@ -268,23 +272,25 @@ public final class BucketHandler implements AutoCloseable {
     }
 
     // put -------------------------------------------------------------------------------------------------------------
-    public void put(String key, byte[] content) {
+    public void put(String key, byte[] content, String contentType) {
         S3Client client = getClient();
 
         PutObjectRequest putObjectRequest = PutObjectRequest.builder()
             .bucket(bucket)
             .key(this.prefix + key)
+            .contentType(contentType)
             .build();
 
         client.putObject(putObjectRequest, RequestBody.fromBytes(content));
     }
 
-    public void put(String key, Path path) {
+    public void put(String key, Path path, String contentType) {
         S3Client client = getClient();
 
         PutObjectRequest putObjectRequest = PutObjectRequest.builder()
             .bucket(bucket)
             .key(this.prefix + key)
+            .contentType(contentType)
             .build();
 
         client.putObject(putObjectRequest, RequestBody.fromFile(path));
