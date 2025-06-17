@@ -344,6 +344,10 @@ public final class BucketHandler implements AutoCloseable {
             return s3Object;
         }
 
+        public String key() {
+            return s3Object.key();
+        }
+
         public InputStream getInputStream() {
             return BucketHandler.this.getInputStream(this);
         }
