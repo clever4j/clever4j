@@ -9,7 +9,7 @@ import java.util.Comparator;
 import java.util.Objects;
 
 @AllNonnullByDefault
-public abstract class MimeTypeValueTemplate<T extends MimeTypeValueTemplate<T>> implements Comparable<T>, StringSerializable {
+public abstract class MimeTypeValueTemplate<T extends MimeTypeValueTemplate<T>> implements NullableValue, Comparable<T>, StringSerializable {
 
     private final static Comparator<String> STRING_COMPARATOR = Comparator.nullsLast(String::compareTo);
 
@@ -36,6 +36,14 @@ public abstract class MimeTypeValueTemplate<T extends MimeTypeValueTemplate<T>> 
         }
 
         return value;
+    }
+
+    public boolean isSet() {
+        return value != null;
+    }
+
+    public boolean isNotSet() {
+        return value == null;
     }
 
     @Nullable

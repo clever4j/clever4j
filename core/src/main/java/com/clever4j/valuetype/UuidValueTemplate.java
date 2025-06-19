@@ -11,7 +11,7 @@ import java.util.UUID;
 import static java.util.Objects.requireNonNull;
 
 @AllNonnullByDefault
-public abstract class UuidValueTemplate<T extends UuidValueTemplate<T>> implements Comparable<T>, StringSerializable {
+public abstract class UuidValueTemplate<T extends UuidValueTemplate<T>> implements NullableValue, Comparable<T>, StringSerializable {
 
     private final static Comparator<UUID> STRING_COMPARATOR = Comparator.nullsLast(UUID::compareTo);
 
@@ -58,12 +58,20 @@ public abstract class UuidValueTemplate<T extends UuidValueTemplate<T>> implemen
         return String.valueOf(value);
     }
 
-    public boolean equals(UUID object) {
+    public boolean equals(@Nullable UUID object) {
         return Objects.equals(value, object);
     }
 
     public boolean equals(String value) {
         return Objects.equals(this.value, UUID.fromString(value));
+    }
+
+    public boolean isSet() {
+        return value != null;
+    }
+
+    public boolean isNotSet() {
+        return value == null;
     }
 
     @Nullable
@@ -73,10 +81,9 @@ public abstract class UuidValueTemplate<T extends UuidValueTemplate<T>> implemen
     }
 
     @Override
-    public boolean equals(Object object) {
-        if (this == object) return true;
-        if (object == null || getClass() != object.getClass()) return false;
-        UuidValueTemplate<?> that = (UuidValueTemplate<?>) object;
+    public boolean equals(@Nullable Object o) {
+        if (o == null || getClass() != o.getClass()) return false;
+        UuidValueTemplate<?> that = (UuidValueTemplate<?>) o;
         return Objects.equals(value, that.value);
     }
 

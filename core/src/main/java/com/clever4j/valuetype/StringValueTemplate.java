@@ -8,7 +8,7 @@ import java.util.Comparator;
 import java.util.Objects;
 
 @AllNonnullByDefault
-public abstract class StringValueTemplate<T extends StringValueTemplate<T>> implements Comparable<T>, StringSerializable {
+public abstract class StringValueTemplate<T extends StringValueTemplate<T>> implements NullableValue, Comparable<T>, StringSerializable {
 
     private final static Comparator<String> STRING_COMPARATOR = Comparator.nullsLast(String::compareTo);
 
@@ -48,6 +48,14 @@ public abstract class StringValueTemplate<T extends StringValueTemplate<T>> impl
     }
 
     public boolean isNull() {
+        return value == null;
+    }
+
+    public boolean isSet() {
+        return value != null;
+    }
+
+    public boolean isNotSet() {
         return value == null;
     }
 
