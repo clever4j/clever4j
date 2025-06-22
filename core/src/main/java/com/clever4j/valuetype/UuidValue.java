@@ -25,6 +25,14 @@ public final class UuidValue extends UuidValueTemplate<UuidValue> {
         }
     }
 
+    public static UuidValue of(@Nullable String value) {
+        if (value == null) {
+            return NULL_INSTANCE;
+        } else {
+            return of(UUID.fromString(value));
+        }
+    }
+
     @Override
     protected UuidValue createObject(@Nullable UUID value) {
         return of(value);
