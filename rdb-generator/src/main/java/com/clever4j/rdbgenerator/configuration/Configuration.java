@@ -42,7 +42,8 @@ public class Configuration {
                 readString(database.dbUser(), "repository.%s.db-user is required".formatted(id)),
                 readString(database.dbPassword(), "repository.%s.db-password is required".formatted(id)),
                 readStringList(database.excludeTables(), false, ""),
-                readStringList(database.onlyTables(), false, ""),
+
+                database.onlyTables(),
 
                 readString(database.packageName(), "repository.%s.package-name is required".formatted(id)),
                 readPath(database.output(), "repository.%s.output is required".formatted(id)),
