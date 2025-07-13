@@ -57,12 +57,12 @@ public abstract class ${implementationDaoTemplate.simpleName} {
     }
 
     // getById ---------------------------------------------------------------------------------------------------------
-    @jakarta.annotation.Nullable
+    @jakarta.annotation.Nonnull
     public ${record.simpleName()} getById(<#list record.primaryKeys() as f>${f.type().getName()} ${f.name()}<#if f?has_next>,</#if></#list>) {
         return getById(<#list record.primaryKeys() as f>${f.name()}<#if f?has_next>, </#if></#list>, connectionProvider.getConnection("${database.id()}"));
     }
 
-    @jakarta.annotation.Nullable
+    @jakarta.annotation.Nonnull
     public ${record.simpleName()} getById(<#list record.primaryKeys() as f>${f.type().getName()} ${f.name()}<#if f?has_next>,</#if></#list>, Connection connection) {
         Select select = buildSelect()
             .where(where -> {
@@ -116,10 +116,10 @@ public abstract class ${implementationDaoTemplate.simpleName} {
             .from("${record.table().name()}");
     }
 
-    @jakarta.annotation.Nullable
+    @jakarta.annotation.Nonnull
     protected ${record.simpleName()} extractOne(List<${record.simpleName()}> records) {
         if (records.isEmpty()) {
-            return null;
+            throw new NoSuchElementException("${record.simpleName()} not found.");
         } else if (records.size() == 1) {
             return records.getFirst();
         } else {
@@ -128,19 +128,19 @@ public abstract class ${implementationDaoTemplate.simpleName} {
     }
 
     // fetch -----------------------------------------------------------------------------------------------------------
-    @jakarta.annotation.Nullable
+    @jakarta.annotation.Nonnull
     protected ${record.simpleName()} fetchOne(Select select, Connection connection) {
         BuildContext context = new BuildContext();
         String sql = builder.build(select, context);
         return fetchOne(sql, context, connection);
     }
 
-    @jakarta.annotation.Nullable
+    @jakarta.annotation.Nonnull
     protected ${record.simpleName()} fetchOne(String query, BuildContext context, Connection connection) {
         List<${record.simpleName()}> result = fetch(query, context, connection);
 
         if (result.isEmpty()) {
-            return null;
+            throw new NoSuchElementException("${record.simpleName()} not found.");
         } else if (result.size() == 1) {
             return result.getFirst();
         } else {

@@ -14,10 +14,10 @@ public interface ${simpleName} {
 
     List<${recordModel.simpleName()}> getAll(Connection connection);
 
-    @jakarta.annotation.Nullable
+    @jakarta.annotation.Nonnull
     ${recordModel.simpleName()} getById(<#list recordModel.primaryKeys() as f>${f.type().getName()} ${f.name()}<#if f?has_next>, </#if></#list>);
 
-    @jakarta.annotation.Nullable
+    @jakarta.annotation.Nonnull
     ${recordModel.simpleName()} getById(<#list recordModel.primaryKeys() as f>${f.type().getName()} ${f.name()}<#if f?has_next>, </#if></#list>, Connection connection);
 
     ${recordModel.simpleName()} requireById(<#list recordModel.primaryKeys() as f>${f.type().getName()} ${f.name()}<#if f?has_next>, </#if></#list>);
